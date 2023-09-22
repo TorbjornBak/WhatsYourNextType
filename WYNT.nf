@@ -19,6 +19,7 @@ workflow{
     
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
+    PEPPER_ch = PEPPER(MINISAM_ch)
     BLAST_ch = BLASTN(ASSEMBLY_ch)
     
 
