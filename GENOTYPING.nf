@@ -41,7 +41,7 @@ process MINISAM{
 
 
     output:
-    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam")
+    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam"), path("${allelename}_lr_mapping.bam.bai")
 
     
     script:
@@ -54,7 +54,6 @@ process MINISAM{
 }
 
 process HAPDUP{
-    
     container = "mkolmogo/hapdup:0.2"
     cpus 8
     memory '4 GB'
@@ -64,7 +63,7 @@ process HAPDUP{
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(bamfile)
+    tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile)
 
     output:
     tuple val(sample_name), val(allelename), path("${allelename}/hapdup")
@@ -72,6 +71,6 @@ process HAPDUP{
     
     script:
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --out-dir ${allelename}/hapdup -t ${task.cpus} --rtype hifi
+    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --out-dir ${allelename}/hapdup -t ${task.cpus}
     """
 }
