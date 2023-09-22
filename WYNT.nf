@@ -14,7 +14,7 @@ workflow{
     
     SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
 
-    ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1])
 
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
     HAPDUP_ch = HAPDUP(MINISAM_ch)
