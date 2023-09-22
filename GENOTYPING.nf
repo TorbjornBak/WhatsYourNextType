@@ -53,6 +53,34 @@ process MINISAM{
 
 }
 
+process PEPPER{
+    container = "kishwars/pepper_deepvariant:r0.8"
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile)
+
+    output:
+    tuple val(sample_name), val(allelename), path("${allelename}/_VCF")
+
+    
+    script:
+    """
+        run_pepper_margin_deepvariant call_variant \
+        -b "${bamfile}" \
+        -f "${assembly}" \
+        -o "${allelename}_VCF" \
+        -t "${task.cpus}" \
+        --ont_r9_guppy5_sup
+
+    """
+}
+
 process HAPDUP{
     container = "mkolmogo/hapdup:0.2"
     cpus 8
