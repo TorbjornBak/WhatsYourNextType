@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY,MINISAM,HAPDUP} from "./GENOTYPING.nf"
+include {FLYEASSEMBLY;MINISAM;HAPDUP} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
 
 
