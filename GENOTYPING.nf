@@ -80,7 +80,6 @@ process PEPPER{
 
     """
 }
-
 process HAPDUP{
     container = "mkolmogo/hapdup:0.2"
     cpus 8

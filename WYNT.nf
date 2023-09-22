@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;MINISAM;HAPDUP} from "./GENOTYPING.nf"
+include {FLYEASSEMBLY;MINISAM;HAPDUP;PEPPER} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
 include {BLASTN} from "./BLAST.nf"
 
@@ -16,7 +16,7 @@ workflow{
     SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
 
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-
+    
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
     BLAST_ch = BLASTN(ASSEMBLY_ch)
