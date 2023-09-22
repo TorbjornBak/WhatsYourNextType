@@ -3,6 +3,7 @@ nextflow.enable.dsl=2
 
 include {FLYEASSEMBLY;MINISAM;HAPDUP} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
+include {BLASTN} from "./BLAST.nf"
 
 
 // Main workflow script for the pipeline
@@ -17,7 +18,8 @@ workflow{
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
 
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
-    HAPDUP_ch = HAPDUP(MINISAM_ch)
-
+    //HAPDUP_ch = HAPDUP(MINISAM_ch)
+    BLAST_ch = BLASTN(ASSEMBLY_ch)
     
+
 }

@@ -11,3 +11,5 @@ Test1.fastq.gz
 Test2.fastq.gz
 *.fastq
 ~
+HLA_database
+cache

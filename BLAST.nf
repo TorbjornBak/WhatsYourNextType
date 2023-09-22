@@ -15,10 +15,11 @@ process BLASTN{
     
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelelname}_blastresults.txt")
+    tuple val(sample_name), val(allelename), path("${allelename}_blastresults.txt")
     
     script:
     """
-    blastn -query ${assembly} -db ${params.blastdb} -out ${allelelname}_blastresults.txt -num_alignments 3 -gapopen 3 -gapextend 2 -penalty 3 -reward 1 -word_size 11 -num_threads ${task.cpus}
+    blastn -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -gapopen 3 -gapextend 2 -penalty -3 -reward 1 -word_size 11 -num_threads ${task.cpus}
     """
 }
+
