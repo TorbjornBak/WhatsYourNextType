@@ -9,7 +9,10 @@ include {SPLITTER} from "./Splitter.nf"
 
 workflow{
 
-    SPLITREADS_ch = SPLITTER(params.primerlist,params.fastqfile,params.samplename)
+    Channel.fromPath(params.primerlist).set{primer_ch}
+    Channel.fromPath(params.fastqfile).set{fastq_ch}
+    
+    SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
 
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch)
 
