@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FASTERQDUMP;TRIM; KRAKEN; TAXREMOVE; FASTQC} from "./Trimming.nf"
+include {FLYEASSEMBLY} from "./GENOTYPING.nf"
 
 
 
@@ -9,6 +9,7 @@ include {FASTERQDUMP;TRIM; KRAKEN; TAXREMOVE; FASTQC} from "./Trimming.nf"
 
 workflow{
 
+    FLYEASSEMBLY()
 
     
 }
