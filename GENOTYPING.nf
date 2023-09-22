@@ -15,12 +15,12 @@ process FLYEASSEMBLY{
     path(splitted_reads)
 
     output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("Assembly/${splitted_reads.baseName}"), path(splitted_reads)
+    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads)
 
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir Assembly/${splitted_reads.baseName}
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName}
     """
 }
 
