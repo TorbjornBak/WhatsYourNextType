@@ -5,3 +5,5 @@ nextflow
 .conda_cache
 null
 Results
+Test1.fastq
+Test2.fastq
