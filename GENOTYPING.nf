@@ -36,7 +36,7 @@ process MINISAM{
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly)
+    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads)
 
 
     output:
