@@ -24,7 +24,8 @@ process SPLITTER{
     """
     rm -rf -f Bins 
     mkdir Bins
-    python ${projectDir}/PrimerSplitter.py $primerlist $fastqFile
+    python ${projectDir}/PrimerSplitter.py ${projectDir}/$primerlist ${projectDir}/$fastqFile \$PWD
+
 
     """
 }

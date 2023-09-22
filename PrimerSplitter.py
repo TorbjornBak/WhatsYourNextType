@@ -53,7 +53,7 @@ def PrimerSplitter(PrimerList, FastqFile):
                     for b in range(4):
                         if record.seq[b:len(primer)+b-i] == (primer[b:-i] or primer[i:] or primer[0:-b]) or record.seq[0:-b] == primer[b:] or record.seq[0:len(primer)-b] == primer[b:]:
                             recordadded = True
-                            writefile = open("/Bins/"+keys+"_bin.fastq", "a")
+                            writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
                             print(record.format("fastq"), file = writefile, end="")
                             break
@@ -62,7 +62,7 @@ def PrimerSplitter(PrimerList, FastqFile):
                         revPrimer = reverseComplementaryprimer(primer)
                         if record.seq[len(record.seq)-len(primer)- b:len(record.seq)-b] == (revPrimer[0:] or revPrimer[0:-b] or revPrimer[b:]):
                             recordadded = True
-                            writefile = open("/Bins/"+keys+"_bin.fastq", "a")
+                            writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
                             print(record.format("fastq"), file = writefile, end="")
                             break
@@ -74,16 +74,16 @@ def PrimerSplitter(PrimerList, FastqFile):
             if recordadded == True:
                     break
         if recordadded == False:
-            writefile = open("/Bins/excess_bin.fastq", "a")
+            writefile = open(workDir+"/Bins/excess_bin.fastq", "a")
             print(record.format("fastq"), file = writefile, end ="")       
         recordadded = False
     
     FileList = list(FileList)
-    FileList = PrimerAligner(PrimerDict, FileList, "./Bins/excess_bin.fastq")
-    subprocess.run(["rm","./Bins/excess_bin.fastq"])
+    FileList = PrimerAligner(PrimerDict, FileList, workDir+"/Bins/excess_bin.fastq")
+    subprocess.run(["rm",workDir+"/Bins/excess_bin.fastq"])
     return(FileList)
 
-def PrimerAligner(PrimerDict, FileList,fastq = "./Bins/excess_bin.fastq",):
+def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
     alignmentcounter = 0
     from Bio import SeqIO
     from Bio import pairwise2
@@ -114,11 +114,11 @@ def PrimerAligner(PrimerDict, FileList,fastq = "./Bins/excess_bin.fastq",):
            #     break
        # if alignments <= 17:
         if maxAlignmentScore > 18:
-            writefile = open("./Bins/"+maxKey+"_bin.fastq","a")
+            writefile = open(workDir+"/Bins/"+maxKey+"_bin.fastq","a")
             print(record.format("fastq"), file = writefile, end="")
             writefile.close()
         else:
-            writefile = open("./Bins/"+"excess_bin2.fastq","a")
+            writefile = open(workDir+"/Bins/"+"excess_bin2.fastq","a")
             print(record.format("fastq"), file = writefile, end="")
             writefile.close()
         
@@ -127,6 +127,7 @@ import sys
 
 PrimerList = sys.argv[1]
 FastQFile = sys.argv[2]
+workDir = sys.argv[3]
 
 PrimerSplitter(PrimerList, FastQFile)
 
