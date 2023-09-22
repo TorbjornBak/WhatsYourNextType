@@ -80,7 +80,7 @@ def PrimerSplitter(PrimerList, FastqFile):
     
     FileList = list(FileList)
     FileList = PrimerAligner(PrimerDict, FileList, "./Bins/excess_bin.fastq")
-    subprocess.run(["rm","excess_bin.fastq"])
+    subprocess.run(["rm","./Bins/excess_bin.fastq"])
     return(FileList)
 
 def PrimerAligner(PrimerDict, FileList,fastq = "./Bins/excess_bin.fastq",):
