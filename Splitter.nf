@@ -2,7 +2,7 @@
 
 
 
-process Splitter{
+process SPLITTER{
 
     cpus 8
     memory '4 GB'
@@ -16,8 +16,9 @@ process Splitter{
     val samplename
 
     output:
-    path("Bins/*")
     val samplename
+    path("Bins/*")
+    
     
     script:
     """
