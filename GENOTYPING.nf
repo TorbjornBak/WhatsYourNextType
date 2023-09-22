@@ -46,7 +46,7 @@ process MINISAM{
     
     script:
     """
-    minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 4G > ${allelename}_lr_mapping.bam
+    minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G > ${allelename}_lr_mapping.bam
     samtools index -@ 4 ${allelename}_lr_mapping.bam
     """
 
