@@ -22,7 +22,7 @@ process SPLITTER{
     
     script:
     """
-    rm -rf -p Bins 
+    rm -rf -f Bins 
     mkdir Bins
     python ${projectDir}/PrimerSplitter.py $primerlist $fastqFile
 
