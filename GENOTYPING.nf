@@ -12,7 +12,8 @@ process FLYEASSEMBLY{
     
     input: 
     val(sample_name)
-    path(splitted_reads)
+    each path(splitted_reads)
+    
 
     output:
     tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads)
