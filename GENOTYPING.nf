@@ -66,11 +66,11 @@ process HAPDUP{
     tuple val(sample_name), val(allelename), path(assembly), path(bamfile)
 
     output:
-    tuple val(sample_name), val(allelename), path("${workDir}/${allelename}/hapdup")
+    tuple val(sample_name), val(allelename), path("${allelename}/hapdup")
 
     
     script:
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --out-dir ${workDir}/${allelename}/hapdup -t ${task.cpus} --rtype hifi
+    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --out-dir ${allelename}/hapdup -t ${task.cpus} --rtype hifi
     """
 }
