@@ -22,7 +22,7 @@ workflow{
     //MINISAM_ch = MINISAM(ASSEMBLY_ch)
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
     //PEPPER_ch = PEPPER(MINISAM_ch)
-    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 7)
+    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 8)
     BLAST_ch.view()
     BLASTcat_ch = CATBLAST(BLAST_ch).view()
 
