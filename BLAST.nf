@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-process BLASTN{
+process BLASTN {
     
     conda "bioconda::blast"
     cpus 8
@@ -15,7 +15,7 @@ process BLASTN{
     
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_blastresults.txt")
+    tuple val(sample_name), path("${allelename}_blastresults.txt")
     
     script:
     """
@@ -23,3 +23,61 @@ process BLASTN{
     """
 }
 
+process CATBLAST {
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+      
+    input: 
+    tuple val(sample_name), path(blastresults)
+
+    output:
+    tuple val(sample_name), path("${sample_name}_Blastresults.txt")
+    
+    script:
+    """
+    cat *_blastresults.txt > ${sample_name}_Blastresults.txt
+    """
+}
+
+process HLAGENOTYPER {
+
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), path(blastresults)
+    
+
+    output:
+    tuple val(sample_name), path ("${sample_name}_HLA_type.txt")
+    
+    script:
+    """
+    python3 ${projectDir}/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.txt
+    """
+
+}
+
+process MAKEBLASTDB {
+    
+    conda "bioconda::blast"
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    path(makeblastdbtitle)
+    path(makeblastfastafile)
+    
+    
+    script:
+    """
+    makeblastdb -in ${makeblastdbfastafile} -parse_seqids -blastdb_version 5 -title "${makeblastdbtitle}" -dbtype nucl
+    
+    """
+}
