@@ -15,3 +15,4 @@ HLA_db.*
 hla_gen.fasta
 HLA_database
 cache
+*.zip
