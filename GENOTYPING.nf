@@ -27,7 +27,7 @@ process FLYEASSEMBLY{
 
 process MINISAM{
 
-    conda "bioconda::flye"
+    conda "bioconda::minimap2 bioconda::samtools"
     
     cpus 8
     memory '4 GB'
