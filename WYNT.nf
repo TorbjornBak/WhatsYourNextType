@@ -10,8 +10,6 @@ include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
 
 workflow{
 
-    // if (params.makeblastdb == "None") {
-
     Channel.fromPath(params.primerlist).set{primer_ch}
     Channel.fromPath(params.fastqfile).set{fastq_ch}
     
@@ -33,11 +31,4 @@ workflow{
     
 
     HLA_type_ch = HLAGENOTYPER(BLASTcat_ch)
-    // }
-    
-    // else {
-    //     MAKEBLASTDB(params.makeblastdb,params.blastdbfastafile)
-    // }
-    
-
 }
