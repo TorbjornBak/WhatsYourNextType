@@ -17,9 +17,42 @@ process BLASTN {
     output:
     tuple val(sample_name), path("${allelename}_blastresults.txt")
     
+    //script:
+    //"""
+    //blastn -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -gapopen 3 -gapextend 2 -penalty -3 -reward 2 -word_size 28 -num_threads ${task.cpus}
+    //"""
     script:
     """
-    blastn -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -gapopen 3 -gapextend 2 -penalty -3 -reward 1 -word_size 11 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    """
+
+}
+
+
+process BLASTNC {
+    
+    conda "bioconda::blast"
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads)
+    
+
+    output:
+    tuple val(sample_name), path("${allelename}_blastresults.txt")
+    
+    // script:
+    // """
+    // blastn -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -gapopen 3 -gapextend 2 -penalty -3 -reward 1 -word_size 11 -num_threads ${task.cpus}
+    // """
+    script:
+    """
+    blastn -task megablast -query ${assembly}/consensus_references.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
     """
 }
 
