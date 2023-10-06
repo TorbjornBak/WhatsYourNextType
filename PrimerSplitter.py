@@ -56,10 +56,10 @@ def PrimerSplitter(PrimerList, FastqFile):
                             recordadded = True
                             writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
-                            print(record.id, file = writefile, end="")
-                            print(record.seq[15:], file = writefile, end="")
-                            print("+", file = writefile, end="")
-                            print(record.letter_annotations["phred_quality"], file = writefile)
+                            print("@"+record.id, file = writefile)
+                            print(record.seq[15:], file = writefile)
+                            print("+", file = writefile)
+                            print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[15:], file = writefile)
                             break
                         
                         
@@ -68,10 +68,10 @@ def PrimerSplitter(PrimerList, FastqFile):
                             recordadded = True
                             writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
-                            print(record.id, file = writefile, end="")
-                            print(record.seq[:-15], file = writefile, end="")
-                            print("+", file = writefile, end="")
-                            print(record.letter_annotations["phred_quality"], file = writefile)
+                            print("@"+record.id, file = writefile)
+                            print(record.seq[:-15], file = writefile,)
+                            print("+", file = writefile)
+                            print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[:-15], file = writefile)
                             break
                             
                     if recordadded == True:
@@ -124,15 +124,15 @@ def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
         if maxAlignmentScore > 14:
             writefile = open(workDir+"/Bins/"+maxKey+"_bin.fastq","a")
             if Align1Flag == True:
-                print(record.id, file = writefile, end="")
-                print(record.seq[15:], file = writefile, end="")
-                print("+", file = writefile, end="")
-                print(record.letter_annotations["phred_quality"], file = writefile)
+                print("@"+record.id, file = writefile)
+                print(record.seq[15:], file = writefile)
+                print("+", file = writefile)
+                print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[15:], file = writefile)
             else:
-                print(record.id, file = writefile, end="")
-                print(record.seq[:-15], file = writefile, end="")
-                print("+", file = writefile, end="")
-                print(record.letter_annotations["phred_quality"], file = writefile)
+                print("@"+record.id, file = writefile)
+                print(record.seq[:-15], file = writefile)
+                print("+", file = writefile)    
+                print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[:-15], file = writefile)
             
             writefile.close()
         
