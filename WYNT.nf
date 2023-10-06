@@ -3,9 +3,9 @@ nextflow.enable.dsl=2
 
 include {FLYEASSEMBLY;MINISAM;HAPDUP} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
-include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST} from "./BLAST.nf"
+include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
-include {AVA} from "./MSA.nf"
+include {AVA;ISONCLUST} from "./MSA.nf"
 
 // Main workflow script for the pipeline
 
@@ -17,16 +17,17 @@ workflow{
     SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
 
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-    AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-
+    //AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    CLUSTERS_ch = ISONCLUST(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    BLAST_ch = BLASTNC(CLUSTERS_ch)
     
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
-    CLAIR3_ch = CLAIR3(MINISAM_ch)
+    //CLAIR3_ch = CLAIR3(MINISAM_ch)
     //VCFTOFASTA_ch = VCFTOFASTA(CLAIR3_ch)
 
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
     //PEPPER_ch = PEPPER(MINISAM_ch)
-    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 8)
+    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 7)
     BLAST_ch.view()
     BLASTcat_ch = CATBLAST(BLAST_ch).view()
 
