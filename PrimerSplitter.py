@@ -45,6 +45,7 @@ def PrimerSplitter(PrimerList, FastqFile):
     for keys1 in PrimerDict.keys():
         subprocess.run(["rm", keys1+"_bin.fastq", "-f"])
     recordadded = False
+    printFlag = False
     FileList = set()
     for record in SeqIO.parse(FastqFile, "fastq"):
         for keys in PrimerDict.keys():
@@ -55,7 +56,10 @@ def PrimerSplitter(PrimerList, FastqFile):
                             recordadded = True
                             writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
-                            print(record.format("fastq"), file = writefile, end="")
+                            print(record.id, file = writefile, end="")
+                            print(record.seq[15:], file = writefile, end="")
+                            print("+", file = writefile, end="")
+                            print(record.letter_annotations["phred_quality"], file = writefile)
                             break
                         
                         
@@ -64,7 +68,10 @@ def PrimerSplitter(PrimerList, FastqFile):
                             recordadded = True
                             writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
                             FileList.add(keys+"_bin.fastq")
-                            print(record.format("fastq"), file = writefile, end="")
+                            print(record.id, file = writefile, end="")
+                            print(record.seq[:-15], file = writefile, end="")
+                            print("+", file = writefile, end="")
+                            print(record.letter_annotations["phred_quality"], file = writefile)
                             break
                             
                     if recordadded == True:
@@ -87,39 +94,46 @@ def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
     alignmentcounter = 0
     from Bio import SeqIO
     from Bio import pairwise2
-
+    Align1Flag = True
     for record in SeqIO.parse(fastq, "fastq"):
         maxAlignmentScore = 0
         maxKey = ""
         for keys in PrimerDict.keys():
             for primer in PrimerDict[keys]:
                 revPrimer = reverseComplementaryprimer(primer)
-                revRecord = record.seq[len(record.seq)-len(primer):]
-                seq1 = primer
-                seq2 = record.seq[0:len(primer)+1]
-                alignments1 = pairwise2.align.globalxx(seq1,seq2, score_only = True)
-                alignments2 = pairwise2.align.globalxx(revPrimer,revRecord, score_only = True)
-                BestAlign = max(alignments1,alignments2)
+                revRecord = record.seq[len(record.seq)-len(primer)-4:]
                 
-                if BestAlign > maxAlignmentScore:
-                    maxAlignmentScore = BestAlign
-                    maxKey = keys
-                #if alignments > 14:
-                    #alignmentcounter += 1
-                    #writefile = open(keys+"_bin.fastq", "a")
-                    #print(record.format("fastq"), file = writefile, end="")
-                    #writefile.close()
-                   # break
-           # if alignments > 17:
-           #     break
-       # if alignments <= 17:
-        if maxAlignmentScore > 18:
+                seq2 = record.seq[0:len(primer)+4]
+                forwardAlign = pairwise2.align.globalxx(primer,seq2, score_only = True)
+                revAlign = pairwise2.align.globalxx(revPrimer,revRecord, score_only = True)
+                
+                if forwardAlign > revAlign: 
+                    if forwardAlign > maxAlignmentScore:
+                        maxAlignmentScore = forwardAlign
+                        maxKey = keys
+                        Align1Flag = True
+
+                else:
+                    if revAlign > maxAlignmentScore:
+                        maxAlignmentScore = revAlign
+                        maxKey = keys
+                        Align1Flag = False
+                
+                
+
+        if maxAlignmentScore > 14:
             writefile = open(workDir+"/Bins/"+maxKey+"_bin.fastq","a")
-            print(record.format("fastq"), file = writefile, end="")
-            writefile.close()
-        else:
-            writefile = open(workDir+"/Bins/"+"excess_bin2.fastq","a")
-            print(record.format("fastq"), file = writefile, end="")
+            if Align1Flag == True:
+                print(record.id, file = writefile, end="")
+                print(record.seq[15:], file = writefile, end="")
+                print("+", file = writefile, end="")
+                print(record.letter_annotations["phred_quality"], file = writefile)
+            else:
+                print(record.id, file = writefile, end="")
+                print(record.seq[:-15], file = writefile, end="")
+                print("+", file = writefile, end="")
+                print(record.letter_annotations["phred_quality"], file = writefile)
+            
             writefile.close()
         
     return(FileList)

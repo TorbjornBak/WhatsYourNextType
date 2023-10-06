@@ -25,6 +25,33 @@ process FLYEASSEMBLY{
     """
 }
 
+process FLYEASSEMBLY2{
+    
+    conda "bioconda::flye"
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(splitted_reads), path(cluster1),path(cluster2)
+
+    
+
+    output:
+    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path(splitted_reads)
+    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster2.baseName}"), path(splitted_reads)
+
+    
+    script:
+    """
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster1.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster2.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+
+    """
+}
 process MINISAM{
 
     conda "bioconda::minimap2 bioconda::samtools"
