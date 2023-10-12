@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process FLYEASSEMBLY{
-    
+    errorStrategy 'ignore'
     conda "bioconda::flye"
     cpus 8
     memory '4 GB'
@@ -11,8 +11,7 @@ process FLYEASSEMBLY{
 
     
     input: 
-    val(sample_name)
-    each path(splitted_reads)
+    tuple val(sample_name), path(splitted_reads)
     
 
     output:
