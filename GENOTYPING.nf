@@ -40,8 +40,7 @@ process FLYEASSEMBLY2{
     
 
     output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path(splitted_reads)
-    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster2.baseName}"), path(splitted_reads)
+    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path("${cluster2.baseName}"), path(splitted_reads)
 
     
     script:
