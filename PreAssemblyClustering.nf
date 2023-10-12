@@ -4,7 +4,6 @@ process SPLITTER2{
     cpus 8
     memory '4 GB'
     
-    publishDir "${params.ouASSEMBLY_chtdir}/${samplename}", mode: 'copy'
 
     
     input:
@@ -12,13 +11,15 @@ process SPLITTER2{
     
 
     output:
-    tuple val(sample_name), val(allelename), path(splitted_reads), path("${allelename}.cluster1*"),path("${allelename}.cluster2*")
+    tuple val(sample_name), val(allelename), path("Clusters_${allelename}/*")
+    
     
     
     
     script:
     """
-    minimap2 -x ava-ont ${splitted_reads} ${assembly}/assembly.fasta > output.paf
-    python ${projectDir}/Clustering.py output.paf ${allelename} ${splitted_reads}
+    rm -rf -f Clusters_${allelename}
+    mkdir Clusters_${allelename}
+    python ${projectDir}/Clustering.py ${assembly}/assembly.fasta ${allelename} ${splitted_reads} \$PWD
     """
 }

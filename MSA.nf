@@ -45,7 +45,3 @@ process ISONCLUST {
     """
 }
 
-process ClusterSplitter {
-
-    
-}
