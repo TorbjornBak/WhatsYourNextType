@@ -20,12 +20,13 @@ workflow{
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
 
     SPLITTER2_ch = SPLITTER2(ASSEMBLY_ch)
+    ASSEMBLY2_ch = FLYEASSEMBLY2(SPLITTER2_ch.transpose())
 
-    ASSEMBLY2_ch = FLYEASSEMBLY2(SPLITTER2_ch)
 
-//    //AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-    CLUSTERS_ch = ISONCLUST(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-    BLAST_ch = BLASTNC(CLUSTERS_ch)
+
+    //AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    //CLUSTERS_ch = ISONCLUST(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    //BLAST_ch = BLASTNC(CLUSTERS_ch)
     
 //    MINISAM_ch = MINISAM(ASSEMBLY_ch)
 //    CLAIR3_ch = CLAIR3(MINISAM_ch)
@@ -33,8 +34,8 @@ workflow{
 
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
     //PEPPER_ch = PEPPER(MINISAM_ch)
-
-    BLAST_ch = BLASTN(ASSEMBLY2_ch).groupTuple(size: 7)
+    BLAST_ch = BLASTN(ASSEMBLY2_ch).groupTuple(size: 14)
+    BLAST_ch.view()
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
     

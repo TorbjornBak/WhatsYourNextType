@@ -11,7 +11,7 @@ process BLASTN {
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path(assembly)
     
 
     output:
@@ -23,7 +23,7 @@ process BLASTN {
     //"""
     script:
     """
-    blastn -task megablast -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
     """
 
 }

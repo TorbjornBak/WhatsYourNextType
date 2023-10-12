@@ -21,7 +21,7 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error 0.1 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 1001 --genome-size 3500 --asm-coverage 100 --no-alt-contigs
     """
 }
 
@@ -31,25 +31,33 @@ process FLYEASSEMBLY2{
     cpus 8
     memory '4 GB'
     time 1.hour
-        
+    errorStrategy {task.attempt < 6 ? 'retry' : 'ignore'}
+    maxRetries 5
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(splitted_reads), path(cluster1),path(cluster2)
-
+    tuple val(sample_name), val(allelename), path(cluster)
     
 
     output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path("${cluster2.baseName}"), path(splitted_reads)
+    tuple val(sample_name), val(cluster.baseName), path("${cluster.baseName}/assembly.fasta")
 
     
+
     script:
+    if (task.attempt < 4){
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster1.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster2.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+    VAR=\$((4000-${task.attempt}*1000))
+    flye --nano-hq ${cluster} --read-error 0.01 --threads ${task.cpus} --out-dir ${cluster.baseName} --min-overlap \$VAR --genome-size 3500 --keep-haplotypes
 
     """
+    }else{
+    """
+    mkdir ${cluster.baseName}
+    touch ${cluster.baseName}/assembly.fasta
+    """
+    }
 }
 process MINISAM{
 
