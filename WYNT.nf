@@ -29,9 +29,9 @@ workflow{
     ASSEMBLY_ch = FLYEASSEMBLY(Clusters_ch.transpose())
     //ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
 
-    SPLITTER2_ch = SPLITTER2(ASSEMBLY_ch)
+    //SPLITTER2_ch = SPLITTER2(ASSEMBLY_ch)
 
-    ASSEMBLY2_ch = FLYEASSEMBLY2(SPLITTER2_ch)
+   // ASSEMBLY2_ch = FLYEASSEMBLY2(SPLITTER2_ch)
 
 //    //AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
     
