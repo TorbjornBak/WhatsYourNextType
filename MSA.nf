@@ -46,7 +46,7 @@ process ISONCLUST {
 }
 
 process CLUSTERALIGNER{
-    conda "bioconda::biopython scipy progress pandas numpy=1.13.3 scikit-learn"
+    conda "bioconda::biopython anaconda::scipy anaconda::pandas anaconda::numpy anaconda::scikit-learn=1.3.0"
     cpus 1
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
@@ -59,12 +59,13 @@ process CLUSTERALIGNER{
     
     script:
     """
+
     python3 ${projectDir}/readclust.py --fastq ${splitted_reads} --mode almat --csv ${splitted_reads.baseName}_distancematrix.csv
     """
 }   
 
 process CLUSTERSPLITTER {
-    conda "bioconda::biopython scipy progress pandas numpy=1.13.3 scikit-learn"
+    conda "bioconda::biopython anaconda::scipy anaconda::pandas anaconda::numpy anaconda::scikit-learn=1.3.0"
     cpus 1
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
@@ -73,7 +74,7 @@ process CLUSTERSPLITTER {
 
 
     output:
-    tuple val(sample_name), path("${splitted_reads.baseName}_cluster{1,2}.fastq")
+    tuple val(sample_name), path("${splitted_reads.baseName}_cluster*.fastq")
     
     script:
     """

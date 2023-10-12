@@ -6,7 +6,6 @@ include {SPLITTER} from "./Splitter.nf"
 include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
 include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
-include {AVA;ISONCLUST} from "./MSA.nf"
 include {SPLITTER2} from "./PreAssemblyClustering.nf"
 
 // Main workflow script for the pipeline
@@ -42,7 +41,7 @@ workflow{
 
     //HAPDUP_ch = HAPDUP(MINISAM_ch)
     //PEPPER_ch = PEPPER(MINISAM_ch)
-    BLAST_ch = BLASTN(ASSEMBLY_ch).view()
+    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 11).view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
     
