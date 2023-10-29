@@ -24,3 +24,5 @@ HLAdatabase
 report*
 *.xlsx
 *.Identifier
+PairwiseAlignTest
+HapDupTest
