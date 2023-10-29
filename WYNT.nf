@@ -1,12 +1,13 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;FLYEASSEMBLY2;MINISAM;HAPDUP} from "./GENOTYPING.nf"
+include {FLYEASSEMBLY;FLYEASSEMBLY2;MINISAM;HAPDUP;SHASTA} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
 include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
 include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
-include {SPLITTER2} from "./PreAssemblyClustering.nf"
+
+//include {SPLITTER2} from "./PreAssemblyClustering.nf"
 
 // Main workflow script for the pipeline
 
@@ -17,16 +18,16 @@ workflow{
     
     SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
 
-
-    ClusterAlignments_ch = CLUSTERALIGNER(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
-    Clusters_ch = CLUSTERSPLITTER(ClusterAlignments_ch)
+    //ClusterAlignments_ch = CLUSTERALIGNER(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    //Clusters_ch = CLUSTERSPLITTER(ClusterAlignments_ch)
     //Clusters_ch[1].view()
     
     //Clusters_ch[1].flatten().view()
-    Clusters_ch.transpose().view()
-    //Clusters_ch.tranpose().view()
-    ASSEMBLY_ch = FLYEASSEMBLY(Clusters_ch.transpose())
-    //ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
+    //Clusters_ch.transpose().view()
+
+    //ASSEMBLY_ch = FLYEASSEMBLY(Clusters_ch.transpose())
+    ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
+    //SHASTA_ch = SHASTA(SPLITREADS_ch.transpose())
 
     //SPLITTER2_ch = SPLITTER2(ASSEMBLY_ch)
 
@@ -35,13 +36,13 @@ workflow{
 //    //AVA_ch = AVA(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
     
     
-//    //MINISAM_ch = MINISAM(ASSEMBLY_ch)
+    MINISAM_ch = MINISAM(ASSEMBLY_ch)
 //    CLAIR3_ch = CLAIR3(MINISAM_ch)
     //VCFTOFASTA_ch = VCFTOFASTA(CLAIR3_ch)
 
-    //HAPDUP_ch = HAPDUP(MINISAM_ch)
+    HAPDUP_ch = HAPDUP(MINISAM_ch)
     //PEPPER_ch = PEPPER(MINISAM_ch)
-    BLAST_ch = BLASTN(ASSEMBLY_ch).groupTuple(size: 11).view()
+    BLAST_ch = BLASTN(HAPDUP_ch.transpose()).groupTuple().view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
     

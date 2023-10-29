@@ -15,7 +15,7 @@ process BLASTN {
     
 
     output:
-    tuple val(sample_name), path("${allelename}_blastresults.txt")
+    tuple val(sample_name), val(allelename), path("${assembly.baseName}_blastresults.txt")
     
     //script:
     //"""
@@ -23,7 +23,7 @@ process BLASTN {
     //"""
     script:
     """
-    blastn -task megablast -query ${assembly}/assembly.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${assembly.baseName}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
     """
 
 }
@@ -52,7 +52,7 @@ process BLASTNC {
     // """
     script:
     """
-    blastn -task megablast -query ${assembly}/consensus_references.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly}/consensus_references.fasta -db ${projectDir}/${params.blastdb} -out ${allelename}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus} -gapopen 20 -gapextend 20
     """
 }
 
@@ -60,7 +60,7 @@ process CATBLAST {
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
       
     input: 
-    tuple val(sample_name), path(blastresults)
+    tuple val(sample_name), val(allelename), path(blastresults)
 
     output:
     tuple val(sample_name), path("${sample_name}_Blastresults.txt")
