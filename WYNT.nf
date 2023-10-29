@@ -23,11 +23,8 @@ workflow{
     //Clusters_ch[1].view()
     
     //Clusters_ch[1].flatten().view()
-    //Clusters_ch.transpose().view()
 
-    //ASSEMBLY_ch = FLYEASSEMBLY(Clusters_ch.transpose())
-    ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
-    //SHASTA_ch = SHASTA(SPLITREADS_ch.transpose())
+    //ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch[0], SPLITREADS_ch[1].flatten())
 
     //SPLITTER2_ch = SPLITTER2(ASSEMBLY_ch)
 

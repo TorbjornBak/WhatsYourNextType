@@ -11,7 +11,7 @@ process BLASTN {
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path(assembly)
     
 
     output:

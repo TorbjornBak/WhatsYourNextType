@@ -20,41 +20,17 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size 3000 --asm-coverage 800
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
     """
 }
+
+
 
 
 
 process SHASTA{
     
     conda "bioconda::shasta"
-    cpus 8
-    memory '4 GB'
-    time 1.hour
-        
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
-
-    
-    input: 
-    tuple val(sample_name), path(splitted_reads)
-    
-
-    output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads)
-
-    
-    script:
-    """
-    shasta --config Nanopore-May2022 --input ${splitted_reads} --assemblyDirectory ${splitted_reads.baseName} --threads ${task.cpus} --Reads.minReadLength 2000 --Assembly.detangleMethod 2
-    """
-}
-
-
-
-process FLYEASSEMBLY2{
-    
-    conda "bioconda::flye"
     cpus 8
     memory '4 GB'
     time 1.hour
