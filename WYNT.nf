@@ -13,13 +13,14 @@ workflow{
 
     //Channel.fromPath(params.primerlist).set{primer_ch}
     
-    samplename_ch = Channel.of(params.samplename)
+    //samplename_ch = Channel.fromPath(params.samplename)
     fastq_ch = Channel.fromPath(params.fastqfile)
     
-    samplename_ch.view()
+    //samplename_ch2 = Channel.of(samplename_ch)
+    //samplename_ch2.view()
     fastq_ch.view()
 
-    SPLITREADS_ch = SPLITTER(fastq_ch, samplename_ch)
+    SPLITREADS_ch = SPLITTER(fastq_ch)
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
     
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
