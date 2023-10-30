@@ -11,10 +11,10 @@ include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
 
 workflow{
 
-    Channel.fromPath(params.primerlist).set{primer_ch}
-    Channel.fromPath(params.fastqfile).set{fastq_ch}
+    //Channel.fromPath(params.primerlist).set{primer_ch}
+    //Channel.fromPath(params.fastqfile).set{fastq_ch}
     
-    SPLITREADS_ch = SPLITTER(primer_ch,fastq_ch,params.samplename)
+    SPLITREADS_ch = SPLITTER(params.samplename)
 
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
     
