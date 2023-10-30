@@ -13,7 +13,8 @@ workflow{
 
     //Channel.fromPath(params.primerlist).set{primer_ch}
     
-    Channel.fromPath(params.fastqfile).set{fastq_ch}
+    samplename_ch = Channel.of(params.samplename)
+    fastq_ch = Channel.fromPath(params.fastqfile)
     
     SPLITREADS_ch = SPLITTER(fastq_ch,params.samplename)
 
