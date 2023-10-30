@@ -7,19 +7,22 @@ import random
 from Bio import SeqIO
 
 def coverageCalculator(readdict, assemblylength):
-    reads = [sequence for id, sequence in readdict.items()]
-    return len("".join(reads)) / genelength
+    #print(readdict)
+    reads = [len(sequence) for id, sequence in readdict.items()]
+    #print(reads)
+    return sum(reads) / assemblylength
 
 def readDownSampler(readfile, assemblylength, coveragecutoff):
-    readdict = SeqIO.index("example.fasta", "fasta")
+    #readdict = SeqIO.index(readfile, "fastq")
+    readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq"))}
 
     coverage = coverageCalculator(readdict, assemblylength)
-    print(coverage)
+    print("Start coverage:", coverage)
     while coverage > coveragecutoff:
         
         readdict.pop(random.choice(list(readdict.keys())))
         coverage = coverageCalculator(readdict, assemblylength)
-    print(coverage)
+    print("Final coverage:", coverage)
     return readdict
 
 def writeDownsampledReads(readdict, outputfile,fastqfile):
@@ -50,5 +53,6 @@ def arguments():
 def main():
     args = arguments()
     readdict = readDownSampler(args.readfile, args.assemblylength, args.coveragecutoff)
-    writeDownsampledReads(readdict, args.outputfile, args.fastqfile)
+    writeDownsampledReads(readdict, args.outputfile, args.readfile)
+    
 main()
