@@ -169,7 +169,7 @@ process HAPDUP{
     tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile), path(splitted_reads)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta")
 
 
     script:

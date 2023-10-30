@@ -57,7 +57,11 @@ process BLASTNC {
 }
 
 process CATBLAST {
-    
+
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
       
     input: 
