@@ -23,3 +23,5 @@ process SPLITTER2{
     python ${projectDir}/Clustering.py ${assembly}/assembly.fasta ${allelename} ${splitted_reads} \$PWD
     """
 }
+
+
