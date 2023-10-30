@@ -34,3 +34,5 @@ workflow{
 
     HLA_type_ch = HLAGENOTYPER(BLASTcat_ch)
 }
+
+
