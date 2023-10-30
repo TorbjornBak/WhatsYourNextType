@@ -14,6 +14,7 @@ workflow{
     //Channel.fromPath(params.primerlist).set{primer_ch}
     //Channel.fromPath(params.fastqfile).set{fastq_ch}
     
+
     SPLITREADS_ch = SPLITTER(params.samplename)
 
     ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
