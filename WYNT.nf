@@ -10,13 +10,10 @@ include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
 // Main workflow script for the pipeline
 
 workflow{
-
-    //Channel.fromPath(params.primerlist).set{primer_ch}
     
-    //samplename_ch = Channel.fromPath(params.samplename)
     fastq_ch = Channel.fromPath(params.fastqfile)
     
-    SPLITREADS_ch = SPLITTER(fastq_ch,params.samplename)
+    SPLITREADS_ch = SPLITTER(fastq_ch)
 
     DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose(), 3500, 200)
 
