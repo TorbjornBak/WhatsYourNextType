@@ -118,7 +118,7 @@ def missingAlleles(genes,allelelist):
     errorcheck = False
     for i in range(len(genecount)):
         if genecount[i] > 2:
-            print("Error: More than two alleles of gene", allelelist[i], "was found. Do not use these results!")
+            #print("Error: More than two alleles of gene", allelelist[i], "was found. Do not use these results!")
             errorcheck = True
         elif genecount[i] == 0:
             print("Error: No alleles of gene", allelelist[i], "was found. Do not use these results!")
