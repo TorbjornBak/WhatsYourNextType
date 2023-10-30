@@ -57,6 +57,7 @@ process BLASTNC {
 }
 
 process CATBLAST {
+    
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
       
     input: 

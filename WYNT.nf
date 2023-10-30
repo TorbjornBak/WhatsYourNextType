@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA} from "./GENOTYPING.nf"
+include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING} from "./GENOTYPING.nf"
 include {SPLITTER} from "./Splitter.nf"
 include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
@@ -16,7 +16,10 @@ workflow{
     Channel.fromPath(params.fastqfile).set{fastq_ch}
     
     SPLITREADS_ch = SPLITTER(fastq_ch,params.samplename)
-    ASSEMBLY_ch = FLYEASSEMBLY(SPLITREADS_ch.transpose())
+
+    DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose(), 3500, 200)
+
+    ASSEMBLY_ch = FLYEASSEMBLY(DOWNSAMPLED_READS_ch)
     
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
 

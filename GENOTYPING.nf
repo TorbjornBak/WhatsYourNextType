@@ -25,7 +25,30 @@ process FLYEASSEMBLY{
 }
 
 
+process DOWNSAMPLING  {
+    conda "bioconda::biopython"
+    cpus 1
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
+    
+    input: 
+    tuple val(sample_name), path(splitted_reads)
+    val(assumedAssemblylength)
+    val(coverageCutoff)
+    
+
+    output:
+    tuple val(sample_name), path("${splitted_reads.baseName}sub.fastq")
+
+    
+    script:
+    """
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}sub.fastq --assemblylength ${assumedAssemblylength} --coveragecutoff ${coverageCutoff}
+    """
+}
 
 
 process SHASTA{
