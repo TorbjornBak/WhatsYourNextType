@@ -13,10 +13,10 @@ process SPLITTER{
     input: 
     //path(primerlist)
     path(fastqFile)
-    val samplename
+    //path samplename
 
     output:
-    tuple val(samplename), path("Bins/*_bin.fastq")
+    tuple val(fastqFile.baseName), path("Bins/*_bin.fastq")
     
     
     script:
