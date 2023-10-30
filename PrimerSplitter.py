@@ -162,7 +162,6 @@ workDir = sys.argv[3]
 PrimerSplitter(PrimerList, FastQFile)
 
 
-    
         
         
     
