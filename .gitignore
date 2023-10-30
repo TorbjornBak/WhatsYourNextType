@@ -17,5 +17,12 @@ HLA_database
 cache
 *.zip
 HLAdatabase
+
+*.fast*
+*.fastq.gz
+*.fastq.gz*
+report*
+*.xlsx
+*.Identifier
 PairwiseAlignTest
 HapDupTest

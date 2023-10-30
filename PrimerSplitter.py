@@ -87,7 +87,7 @@ def PrimerSplitter(PrimerList, FastqFile):
     
     FileList = list(FileList)
     FileList = PrimerAligner(PrimerDict, FileList, workDir+"/Bins/excess_bin.fastq")
-    subprocess.run(["rm",workDir+"/Bins/excess_bin.fastq"])
+    #subprocess.run(["rm",workDir+"/Bins/excess_bin.fastq"])
     return(FileList)
 
 def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
@@ -121,7 +121,7 @@ def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
                 
                 
 
-        if maxAlignmentScore > 14:
+        if maxAlignmentScore > 18:
             writefile = open(workDir+"/Bins/"+maxKey+"_bin.fastq","a")
             if Align1Flag == True:
                 print("@"+record.id, file = writefile)
@@ -135,7 +135,23 @@ def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
                 print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[:-15], file = writefile)
             
             writefile.close()
-        
+        else:
+            writefile = open(workDir+"/Bins/excess2_bin.fastq","a")
+            if Align1Flag == True:
+                print("@"+record.id, file = writefile)
+                print(record.seq[15:], file = writefile)
+                print("+", file = writefile)
+                print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[15:], file = writefile)
+                
+                
+            else:
+                print("@"+record.id, file = writefile)
+                print(record.seq[:-15], file = writefile)
+                print("+", file = writefile)    
+                print("".join(chr(q + 33) for q in record.letter_annotations["phred_quality"])[:-15], file = writefile)
+
+                
+            writefile.close()
     return(FileList)
 import sys
 
