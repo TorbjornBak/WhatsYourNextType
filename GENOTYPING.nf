@@ -25,7 +25,30 @@ process FLYEASSEMBLY{
 }
 
 
+process DOWNSAMPLING  {
+    conda "bioconda::biopython"
+    cpus 1
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
+    
+    input: 
+    tuple val(sample_name), path(splitted_reads)
+    val(assumedAssemblylength)
+    val(coverageCutoff)
+    
+
+    output:
+    tuple val(sample_name), path("${splitted_reads.baseName}sub.fastq")
+
+    
+    script:
+    """
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}sub.fastq --assemblylength ${assumedAssemblylength} --coveragecutoff ${coverageCutoff}
+    """
+}
 
 
 process SHASTA{
@@ -146,7 +169,7 @@ process HAPDUP{
     tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile), path(splitted_reads)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta")
 
 
     script:
