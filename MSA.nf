@@ -46,7 +46,7 @@ process ISONCLUST {
 }
 
 process CLUSTERALIGNER{
-    conda "bioconda::biopython anaconda::scipy anaconda::pandas anaconda::numpy anaconda::scikit-learn=1.3.0"
+    conda "bioconda::biopython pandas"
     cpus 1
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
@@ -65,7 +65,7 @@ process CLUSTERALIGNER{
 }   
 
 process CLUSTERSPLITTER {
-    conda "bioconda::biopython anaconda::scipy anaconda::pandas anaconda::numpy anaconda::scikit-learn=1.3.0"
+    conda "pandas scikit-learn=1.3.0 bioconda:biopython"
     cpus 1
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 

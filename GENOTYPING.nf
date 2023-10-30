@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 process FLYEASSEMBLY{
-    errorStrategy 'ignore'
+    //errorStrategy 'ignore'
     conda "bioconda::flye"
     cpus 8
     memory '4 GB'
@@ -20,43 +20,39 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.1 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 1001 --genome-size 3500 --asm-coverage 100 --no-alt-contigs
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
     """
 }
 
-process FLYEASSEMBLY2{
+
+
+
+
+process SHASTA{
     
-    conda "bioconda::flye"
+    conda "bioconda::shasta"
     cpus 8
     memory '4 GB'
     time 1.hour
-    errorStrategy {task.attempt < 6 ? 'retry' : 'ignore'}
-    maxRetries 5
+        
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(cluster)
+    tuple val(sample_name), val(allelename), path(splitted_reads), path(cluster1),path(cluster2)
+
     
 
     output:
-    tuple val(sample_name), val(cluster.baseName), path("${cluster.baseName}/assembly.fasta")
+    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path("${cluster2.baseName}"), path(splitted_reads)
 
     
-
     script:
-    if (task.attempt < 4){
     """
-    VAR=\$((4000-${task.attempt}*1000))
-    flye --nano-hq ${cluster} --read-error 0.01 --threads ${task.cpus} --out-dir ${cluster.baseName} --min-overlap \$VAR --genome-size 3500 --keep-haplotypes
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster1.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster2.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
 
     """
-    }else{
-    """
-    mkdir ${cluster.baseName}
-    touch ${cluster.baseName}/assembly.fasta
-    """
-    }
 }
 process MINISAM{
 
@@ -74,7 +70,7 @@ process MINISAM{
 
 
     output:
-    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam"), path("${allelename}_lr_mapping.bam.bai")
+    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam"), path("${allelename}_lr_mapping.bam.bai"), path(splitted_reads)
 
     
     script:
@@ -84,6 +80,12 @@ process MINISAM{
     samtools index -@ 4 ${allelename}_lr_mapping.bam
     samtools faidx ${assembly}/assembly.fasta 
     """
+    // """
+    // minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping.bam
+    
+    // samtools index -@ 4 ${allelename}_lr_mapping.bam
+    
+    // """
 
 
 }
@@ -129,23 +131,59 @@ process VCF{
 }
 
 process HAPDUP{
-    container = "mkolmogo/hapdup:0.2"
+    errorStrategy 'retry'
+    container = "mkolmogo/hapdup:0.12"
+    cpus 4
+    memory '12 GB'
+    time 1.hour
+    maxRetries 3
+
+    
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile), path(splitted_reads)
+
+    output:
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path(splitted_reads)
+
+
+    script:
+    if (task.attempt == 1) {
+    """
+    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.07 --overwrite
+
+    mv ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
+    mv ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
+    """
+    }
+    else {
+    """
+    mkdir ${allelename}_hapdup -p
+    mv ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
+    """
+    }
+}
+
+process WHATSHAP{
+    //errorStrategy 'ignore'
+    conda = "bioconda::whatshap"
     cpus 8
-    memory '4 GB'
+    memory '6 GB'
     time 1.hour
         
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile)
+    tuple val(sample_name), val(allelename), path(assembly), path(inputvcf), path(bamfile)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}/hapdup")
-
     
+
     script:
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --out-dir ${allelename}/hapdup -t ${task.cpus}
+    whatshap phase -o ${allelename}_phased.vcf --no-reference ${inputvcf} ${bamfile}
     """
 }
