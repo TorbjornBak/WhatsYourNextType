@@ -58,7 +58,7 @@ process BLASTNC {
 
 process CATBLAST {
 
-    cpus 8
+    cpus 1
     memory '4 GB'
     time 1.hour
 
