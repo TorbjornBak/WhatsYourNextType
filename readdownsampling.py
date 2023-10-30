@@ -17,6 +17,7 @@ def readDownSampler(readfile, assemblylength, coveragecutoff):
     readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq"))}
 
     coverage = coverageCalculator(readdict, assemblylength)
+    print("Downsampling", readfile)
     print("Start coverage:", coverage)
     while coverage > coveragecutoff:
         
@@ -54,5 +55,5 @@ def main():
     args = arguments()
     readdict = readDownSampler(args.readfile, args.assemblylength, args.coveragecutoff)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
-    
+
 main()
