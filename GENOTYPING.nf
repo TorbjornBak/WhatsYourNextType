@@ -11,7 +11,7 @@ process FLYEASSEMBLY{
 
     
     input: 
-    tuple val(sample_name), path(splitted_reads)
+    tuple val(sample_name), path(splitted_reads), val(assumedcoverage), val(expectedgenomesize)
     
 
     output:
@@ -20,7 +20,7 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size ${expectedgenomesize} --asm-coverage ${assumedcoverage}
     """
 }
 
@@ -41,12 +41,12 @@ process DOWNSAMPLING  {
     
 
     output:
-    tuple val(sample_name), path("${splitted_reads.baseName}sub.fastq")
+    tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), val(coverageCutoff), val(assumedAssemblylength)
 
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}sub.fastq --assemblylength ${assumedAssemblylength} --coveragecutoff ${coverageCutoff}
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --assemblylength ${assumedAssemblylength} --coveragecutoff 200
     """
 }
 

@@ -20,8 +20,8 @@ def readDownSampler(readfile, assemblylength, coveragecutoff):
     print("Downsampling", readfile)
     print("Start coverage:", coverage)
     while coverage > coveragecutoff:
-        
-        readdict.pop(random.choice(list(readdict.keys())))
+        for _ in range(int((coverage / coveragecutoff))):
+            readdict.pop(random.choice(list(readdict.keys())))
         coverage = coverageCalculator(readdict, assemblylength)
     print("Final coverage:", coverage)
     return readdict
