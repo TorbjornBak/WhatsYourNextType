@@ -7,7 +7,7 @@ process SPLITTER{
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4
     memory '4 GB'
-    publishDir "${params.outdir}/${fastqfile.baseName}", mode: 'copy'
+    publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
 
     
     input: 
