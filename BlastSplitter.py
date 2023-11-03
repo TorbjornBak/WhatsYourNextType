@@ -63,7 +63,7 @@ def idtoallele(blastdict,alleledict):
 
     
 def writeReads(ggroupdict,fastqfile,ofA,ofB,ofC,ofDRB1,ofDQA1,ofDQB1,ofDPB1):
-
+    print("Writing reads")
     if len(ggroupdict) > 0:
         ofA,ofBo,ofCo,ofDRB1o,ofDQA1o,ofDQB1o,ofDPB1o = open(ofA,'a'), open(ofB,'a'), open(ofC,'a'), open(ofDRB1,'a'), open(ofDQA1,'a'), open(ofDQB1,'a'), open(ofDPB1,'a')
         errorcount = 0
@@ -96,8 +96,11 @@ def writeReads(ggroupdict,fastqfile,ofA,ofB,ofC,ofDRB1,ofDQA1,ofDQB1,ofDPB1):
                     
         print("Error count", errorcount)
         print("Success count", successcount)
+        
         ofA.close(),ofBo.close(),ofCo.close(),ofDRB1o.close(),ofDQA1o.close(),ofDQB1o.close(),ofDPB1o.close()
-    return
+    else: 
+        print("No reads matched ggroup")
+        return
     
 
 
@@ -125,11 +128,14 @@ def arguments():
 
 def main():
     args = arguments()
+    print("Starting Blast Primer Splitting")
     blastdict = readBlast(args.blastfile)
     alleledict = readAllelelist(args.allelelist)
     #ggroupdict = readHLAgen(args.hlagnom)
     #matches = HLAmatcher(blastdict,ggroupdict)
+    print("Blast Primer Splitting...")
     ggroups = (idtoallele(blastdict,alleledict))
    
     writeReads(ggroups, args.fastq, args.oA, args.oB,args.oC,args.oDRB1, args.oDQA1, args.oDQB1, args.oDPB1)
+    print("Finished writing reads")
 main()

@@ -4,14 +4,14 @@ process FLYEASSEMBLY{
     //errorStrategy 'ignore'
     conda "bioconda::flye"
     cpus 8
-    memory '4 GB'
+    memory '8 GB'
     time 1.hour
         
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
-    tuple val(sample_name), path(splitted_reads), val(assumedcoverage), val(expectedgenomesize)
+    tuple val(sample_name), path(splitted_reads), path(expectedgenomesize)
     
 
     output:
@@ -20,8 +20,11 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --min-overlap 2000 --genome-size ${expectedgenomesize} --asm-coverage ${assumedcoverage}
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 2
     """
+
+    //--meta // --no-alt-contigs // --asm-coverage ${params.coverage.intdiv(2)}
+
 }
 
 
@@ -36,17 +39,17 @@ process DOWNSAMPLING  {
     
     input: 
     tuple val(sample_name), path(splitted_reads)
-    val(assumedAssemblylength)
-    val(coverageCutoff)
+    
+    
     
 
     output:
-    tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), val(coverageCutoff), val(assumedAssemblylength)
+    tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
 
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --assemblylength ${assumedAssemblylength} --coveragecutoff 200
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 2500
     """
 }
 
@@ -169,13 +172,13 @@ process HAPDUP{
     tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile), path(splitted_reads)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta")
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path("${allelename}_hapdup/")
 
 
     script:
     if (task.attempt == 1) {
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.07 --overwrite
+    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.1 --overwrite
 
     mv ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
     mv ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
@@ -188,6 +191,7 @@ process HAPDUP{
     """
     }
 }
+
 
 process WHATSHAP{
     //errorStrategy 'ignore'

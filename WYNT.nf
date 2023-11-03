@@ -15,7 +15,7 @@ workflow{
     
     SPLITREADS_ch = SPLITTER(fastq_ch)
 
-    DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose(), 3500, 100)
+    DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose())
 
     ASSEMBLY_ch = FLYEASSEMBLY(DOWNSAMPLED_READS_ch)
     
@@ -26,6 +26,7 @@ workflow{
     BLAST_ch = BLASTN(HAPDUP_ch.transpose()).groupTuple().view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
+    
     
     
 
