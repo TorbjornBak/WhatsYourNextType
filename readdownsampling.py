@@ -12,12 +12,14 @@ def coverageCalculator(readdict, assemblylength):
     #print(reads)
     return sum(reads) / assemblylength
 
-def readDownSampler(readfile, assemblylength, coveragecutoff):
-    #readdict = SeqIO.index(readfile, "fastq")
-    readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq"))}
+def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff):
+    #Creating a dictionary containing ids and sequences of the reads
+    readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq")) if len(read.seq) > lengthcutoff}
 
     coverage = coverageCalculator(readdict, assemblylength)
+    
     print("Downsampling", readfile)
+    print("Assumed fragment length:", assemblylength)
     print("Start coverage:", coverage)
     while coverage > coveragecutoff:
         for _ in range(int((coverage / coveragecutoff))):
@@ -34,6 +36,16 @@ def writeDownsampledReads(readdict, outputfile,fastqfile):
             outfile.write(read.format('fastq'))
 
 
+def findFragmentLength(fragmentlengthfile, allelename):
+    allele = allelename.split('_')[0]
+    with open(fragmentlengthfile,'r') as file:
+        for line in file:
+            if line.startswith(allele):
+                file = open(line.split()[1] + '.' + allelename,'w')
+                file.close()
+                return int(line.split()[1])
+
+
 class CustomParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write('error: %s\n' % message)
@@ -45,15 +57,19 @@ def arguments():
     parser = CustomParser(description='Genotyper for HLA.')
     parser.add_argument('--readfile', type = str)
     parser.add_argument('--outputfile', type = str)
-    parser.add_argument('--assemblylength', type = int, default = 3000)
+    #parser.add_argument('--assemblylength', type = int, default = 3000)
     parser.add_argument('--coveragecutoff', type = int, default = 100)
+    parser.add_argument('--fragmentlength', type = str, required = True)
+    parser.add_argument('--allele', type = str, required = True)
+    parser.add_argument('--readsizecutoff', type = int, default = 2000)
     
     return parser.parse_args()
 
 
 def main():
     args = arguments()
-    readdict = readDownSampler(args.readfile, args.assemblylength, args.coveragecutoff)
+    assemblylength = findFragmentLength(args.fragmentlength, args.allele)
+    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.readsizecutoff)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
 
 main()

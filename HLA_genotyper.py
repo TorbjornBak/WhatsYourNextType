@@ -180,6 +180,7 @@ def arguments():
     parser.add_argument('--threads', type = int, default = 4)
     parser.add_argument('--output', type = str)
     
+    
     return parser.parse_args()
 
 # def main():

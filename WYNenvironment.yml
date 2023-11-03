@@ -1,0 +1,8 @@
+name: WYNT3
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - nextflow
+  - blast
+  - singularity
