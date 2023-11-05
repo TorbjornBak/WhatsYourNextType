@@ -63,8 +63,8 @@ def PrimerSplitter(PrimerList, FastqFile):
                             break
                         
                         
-                        #revPrimer = reverseComplementaryprimer(primer)
-                        revPrimer = primer.reverse_complement()
+                        revPrimer = reverseComplementaryprimer(primer)
+                        #revPrimer = primer.reverse_complement()
                         if record.seq[len(record.seq)-len(primer)- b:len(record.seq)-b] == (revPrimer[0:] or revPrimer[0:-b] or revPrimer[b:]):
                             recordadded = True
                             writefile = open(workDir+"/Bins/"+keys+"_bin.fastq", "a")
@@ -101,8 +101,8 @@ def PrimerAligner(PrimerDict, FileList,fastq = "excess_bin.fastq",):
         maxKey = ""
         for keys in PrimerDict.keys():
             for primer in PrimerDict[keys]:
-                #revPrimer = reverseComplementaryprimer(primer)
-                revPrimer = primer.reverse_complement()
+                revPrimer = reverseComplementaryprimer(primer)
+                #revPrimer = primer.reverse_complement()
                 revRecord = record.seq[len(record.seq)-len(primer)-4:]
                 
                 seq2 = record.seq[0:len(primer)+4]

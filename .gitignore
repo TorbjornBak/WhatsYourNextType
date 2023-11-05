@@ -26,3 +26,4 @@ report*
 *.Identifier
 PairwiseAlignTest
 HapDupTest
+./Data/PrimerListBigData.tsv
