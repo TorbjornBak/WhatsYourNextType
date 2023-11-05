@@ -20,7 +20,7 @@ process FLYEASSEMBLY{
     
     script:
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 2
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
 
     //--meta // --no-alt-contigs // --asm-coverage ${params.coverage.intdiv(2)}
@@ -49,7 +49,7 @@ process DOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 2500
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 2200
     """
 }
 
