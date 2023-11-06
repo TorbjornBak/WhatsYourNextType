@@ -18,17 +18,17 @@ process FLYEASSEMBLY{
 
     
     script:
-    if (task.attempts == 1) {
+    if (task.attempt == 1) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
     }
-    else if ((task.attempts == 2)) {
+    else if ((task.attempt == 2)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
     }
-    else if ((task.attempts == 3)) {
+    else if ((task.attempt == 3)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
