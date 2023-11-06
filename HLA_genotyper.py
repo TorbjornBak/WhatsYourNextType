@@ -103,7 +103,7 @@ def HLAmatcher(blastdict,hlanomdict, allelelist):
     
     genes = list()
     for gene in blastdict:
-        if gene in allelelist:
+        if blastdict[gene][0][0] in allelelist:
             genes.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]])
     
     return sorted(genes)
