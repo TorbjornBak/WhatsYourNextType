@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
 process FLYEASSEMBLY{
-    //errorStrategy 'ignore'
+    errorStrategy 'retry'
     conda "bioconda::flye"
-    cpus 8
     time 1.hour
+    maxRetries 3
         
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
@@ -18,9 +18,22 @@ process FLYEASSEMBLY{
 
     
     script:
+    if (task.attempts == 1) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
+    }
+    else if ((task.attempts == 2)) {
+    """
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
+    """
+    }
+    else if ((task.attempts == 3)) {
+    """
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
+    """
+    }
+
 
 }
 
