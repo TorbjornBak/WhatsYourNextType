@@ -4,7 +4,6 @@ process FLYEASSEMBLY{
     //errorStrategy 'ignore'
     conda "bioconda::flye"
     cpus 8
-    memory '8 GB'
     time 1.hour
         
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
