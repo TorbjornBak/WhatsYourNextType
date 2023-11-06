@@ -59,8 +59,8 @@ def arguments():
     parser.add_argument('--outputfile', type = str)
     #parser.add_argument('--assemblylength', type = int, default = 3000)
     parser.add_argument('--coveragecutoff', type = int, default = 100)
-    parser.add_argument('--fragmentlength', type = str, required = True)
-    parser.add_argument('--allele', type = str, required = True)
+    parser.add_argument('--fragmentlength', type = str, default = None)
+    parser.add_argument('--allele', type = str, default = None)
     parser.add_argument('--readsizecutoff', type = int, default = 2000)
     
     return parser.parse_args()
@@ -68,7 +68,11 @@ def arguments():
 
 def main():
     args = arguments()
-    assemblylength = findFragmentLength(args.fragmentlength, args.allele)
+    if args.allele is not None:
+        assemblylength = findFragmentLength(args.fragmentlength, args.allele)
+    else:
+        assemblylength = 3200
+
     readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.readsizecutoff)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
 

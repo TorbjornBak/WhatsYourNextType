@@ -11,9 +11,11 @@ include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
 
 workflow{
     
-    fastq_ch = Channel.fromPath(params.fastqfile)
+    FASTQ_ch = Channel.fromPath(params.fastqfile)
+
+    FIRSTDOWNSAMPLING_ch = FIRSTDOWNSAMPLING(FASTQ_ch)
     
-    SPLITREADS_ch = SPLITTER(fastq_ch)
+    SPLITREADS_ch = SPLITTER(FIRSTDOWNSAMPLING_ch)
 
     DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose())
 

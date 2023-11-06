@@ -30,3 +30,26 @@ process SPLITTER{
     """
 }
 
+
+process FIRSTDOWNSAMPLING  {
+    conda "bioconda::biopython"
+    cpus 1
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+
+    
+    input: 
+    path(fastqFile)
+    
+
+    output:
+    path("${fastqFile.baseName}_sub.fastq")
+
+    
+    script:
+    """
+    python3 ${projectDir}/readdownsampling.py  --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 2200
+    """
+}
