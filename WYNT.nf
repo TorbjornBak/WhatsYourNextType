@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING} from "./GENOTYPING.nf"
-include {SPLITTER} from "./Splitter.nf"
+include {SPLITTER;FIRSTDOWNSAMPLING} from "./Splitter.nf"
 include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
 include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
