@@ -97,13 +97,14 @@ def readHLAgen(hlanomfile):
                     hlanomdict[HLAallele,HLA] = [HLAallele, HLA]
     return hlanomdict
 
-def HLAmatcher(blastdict,hlanomdict):
+def HLAmatcher(blastdict,hlanomdict, allelelist):
     print("Matching HLA genes to the HLA gene nomenclature G group dictionary")
     #Matches the blast results to the respective g groups from the hla nom dict and saves the genes to a list
     
     genes = list()
     for gene in blastdict:
-        genes.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]])
+        if gene in allelelist:
+            genes.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]])
     
     return sorted(genes)
 
@@ -207,8 +208,9 @@ def main():
     
     blastdict = readBlast(args.blastfile)
     hlanomdict = readHLAgen(args.hlagen)
-    genes = HLAmatcher(blastdict,hlanomdict)
     allelelist = ["A","B","C","DRB1","DQA1","DQB1","DPB1"]
+    genes = HLAmatcher(blastdict,hlanomdict,allelelist)
+    
     
     missingAlleles(genes,allelelist)
 
