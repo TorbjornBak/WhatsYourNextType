@@ -3,7 +3,7 @@
 
 
 process SPLITTER{
-
+    errorStrategy = "ignore"
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4
     memory '4 GB'

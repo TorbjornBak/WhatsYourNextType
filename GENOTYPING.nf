@@ -23,8 +23,6 @@ process FLYEASSEMBLY{
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5
     """
 
-    //--meta // --no-alt-contigs // --asm-coverage ${params.coverage.intdiv(2)}
-
 }
 
 
