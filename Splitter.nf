@@ -37,7 +37,7 @@ process FIRSTDOWNSAMPLING  {
     memory '4 GB'
     time 1.hour
         
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
 
     
     input: 
