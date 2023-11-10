@@ -6,12 +6,13 @@ process FLYEASSEMBLY{
     time 1.hour
     maxRetries 3
         
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
 
     
     input: 
     tuple val(sample_name), path(splitted_reads), path(expectedgenomesize)
     
+
 
     output:
     tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads),path("${splitted_reads.baseName}/assembly.fasta")
@@ -21,22 +22,28 @@ process FLYEASSEMBLY{
     script:
     if (task.attempt == 1) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1001 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
     """
     }
     else if ((task.attempt == 2)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    printf %s | grep contig ${splitted_reads.baseName}/assembly_info.txt| wc -l
     """
     }
     else if ((task.attempt == 3)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    printf %s | grep contig ${splitted_reads.baseName}/assembly_info.txt| wc -l
     """
     }
 
 
+
 }
+
+
+
 
 process DOWNSAMPLING  {
     conda "bioconda::biopython"
@@ -44,7 +51,7 @@ process DOWNSAMPLING  {
     memory '4 GB'
     time 1.hour
         
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
 
     
     input: 
@@ -98,11 +105,12 @@ process MINISAM{
     memory '4 GB'
     time 1.hour
         
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    publishDir "${params.outdir}/${sample_name}/minisam", mode: 'copy'
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder), path(splitted_reads)
+    
 
 
     output:
@@ -111,10 +119,10 @@ process MINISAM{
     
     script:
     """
-    minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping_old.bam
+    minimap2 -ax map-ont -t ${task.cpus} ${assembly} ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping_old.bam
     samtools addreplacerg -r '@RG\tID:${allelename}\tSM:${allelename}' -o ${allelename}_lr_mapping.bam ${allelename}_lr_mapping_old.bam
     samtools index -@ 4 ${allelename}_lr_mapping.bam
-    samtools faidx ${assembly}/assembly.fasta 
+    samtools faidx ${assembly} 
     """
     // """
     // minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping.bam
@@ -175,7 +183,7 @@ process HAPDUP{
     maxRetries 3
 
     
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    publishDir "${params.outdir}/${sample_name}/hapdup/", mode: 'copy'
 
     
     input: 
@@ -188,20 +196,34 @@ process HAPDUP{
     script:
     if (task.attempt == 1) {
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.1 --overwrite
+    hapdup --assembly ${assembly} --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.1 --overwrite
 
     cp ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
-    cp ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
+    cp ${allelename}_h\$result apdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
     """
     }
     else {
     """
     mkdir ${allelename}_hapdup -p
-    cp ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
+    cp ${assembly} ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
     """
     }
 }
 
+
+process UNPHASED {
+
+    input:
+    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder), path(splitted_reads)
+
+    output:
+    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assemblyfolder)
+    
+    script:
+    """
+    cp ${assembly} ${allelename}_assembly.fasta
+    """
+}
 
 process WHATSHAP{
     //errorStrategy 'ignore'
