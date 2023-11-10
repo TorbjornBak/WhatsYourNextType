@@ -10,7 +10,7 @@ $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O 
 $ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 $ rm -rf ~/miniconda3/miniconda.sh
 $ ~/miniconda3/bin/conda init bash
-Restart the terminal 
+Restart the termina
 
 In the new terminal type these commands:
 $ conda install mamba
