@@ -20,7 +20,7 @@ process FLYEASSEMBLY{
     script:
     if (task.attempt == 1) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1001 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
     """
     }
     else if ((task.attempt == 2)) {
