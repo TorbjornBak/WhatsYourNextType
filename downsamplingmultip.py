@@ -5,6 +5,7 @@ import subprocess
 import os.path
 import random
 from Bio import SeqIO
+import multiprocessing
 
 
 def coverageCalculator(readdict, assemblylength):
@@ -13,9 +14,34 @@ def coverageCalculator(readdict, assemblylength):
     #print(reads)
     return sum(reads) / assemblylength
 
+def process_chunk(chunk, length_cutoff):
+    filtered_reads = {(read.id): (read.seq) for read in chunk if len(read.seq) > length_cutoff}
+    return filtered_reads
+
 def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff):
+
+
+    # Define the number of processes to use
+    num_processes = multiprocessing.cpu_count()
+
+    # Read the FASTQ file in chunks
+    records = list(SeqIO.parse(readfile, "fastq"))
+    chunk_size = len(records) // num_processes
+    chunks = [records[i:i + chunk_size] for i in range(0, len(records), chunk_size)]
+
+    # Create a multiprocessing Pool
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        # Use multiprocessing to filter reads in parallel
+        results = pool.starmap(process_chunk, [(chunk, lengthcutoff) for chunk in chunks])
+
+    # Combine results from different processes
+    readdict = {}
+    for result in results:
+        readdict.update(result)
+
+    print("Filtered reads:", readdict)
     #Creating a dictionary containing ids and sequences of the reads
-    readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq")) if len(read.seq) > lengthcutoff}
+    #readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq")) if len(read.seq) > lengthcutoff}
 
     coverage = coverageCalculator(readdict, assemblylength)
     

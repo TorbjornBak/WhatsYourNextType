@@ -11,11 +11,11 @@ process BLASTN {
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(marginlog)
+    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder)
     
 
     output:
-    tuple val(sample_name), val(allelename), path("${assembly.baseName}_blastresults.txt")
+    tuple val(sample_name), val(allelename), path("${assembly}_blastresults.txt")
     
     //script:
     //"""
@@ -23,7 +23,7 @@ process BLASTN {
     //"""
     script:
     """
-    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${assembly.baseName}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${assembly}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
     """
 
 }
