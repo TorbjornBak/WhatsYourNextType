@@ -20,7 +20,14 @@ workflow{
     DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose())
 
     ASSEMBLY_ch = FLYEASSEMBLY(DOWNSAMPLED_READS_ch)
-    
+
+    //ASSEMBLYSPLIT_ch = ASSEMBLY_ch[1].flatten().splitFasta(record: [id: true, seqString: true ])
+ 
+
+    // if (ASSEMBLYSPLT_ch.size() == 1){
+    //     println ("Hello")
+    // }
+
     MINISAM_ch = MINISAM(ASSEMBLY_ch)
 
     HAPDUP_ch = HAPDUP(MINISAM_ch)

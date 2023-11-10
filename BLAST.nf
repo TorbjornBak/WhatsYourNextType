@@ -2,7 +2,7 @@
 
 process BLASTN {
     
-    conda "bioconda::blast"
+    //conda "bioconda::blast"
     cpus 8
     memory '4 GB'
     time 1.hour

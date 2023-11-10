@@ -14,13 +14,14 @@ process FLYEASSEMBLY{
     
 
     output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads)
+    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads),path("${splitted_reads.baseName}/assembly.fasta")
+    
 
     
     script:
     if (task.attempt == 1) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1001 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
     """
     }
     else if ((task.attempt == 2)) {
@@ -36,7 +37,6 @@ process FLYEASSEMBLY{
 
 
 }
-
 
 process DOWNSAMPLING  {
     conda "bioconda::biopython"
