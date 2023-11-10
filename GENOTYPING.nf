@@ -22,7 +22,7 @@ process FLYEASSEMBLY{
     script:
     if (task.attempt == 1) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1001 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
     """
     }
     else if ((task.attempt == 2)) {
@@ -109,9 +109,8 @@ process MINISAM{
 
     
     input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder), path(splitted_reads)
-    
-
+    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads), val(contigs)
+   
 
     output:
     tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam"), path("${allelename}_lr_mapping.bam.bai"), path(splitted_reads)
@@ -119,10 +118,10 @@ process MINISAM{
     
     script:
     """
-    minimap2 -ax map-ont -t ${task.cpus} ${assembly} ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping_old.bam
+    minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping_old.bam
     samtools addreplacerg -r '@RG\tID:${allelename}\tSM:${allelename}' -o ${allelename}_lr_mapping.bam ${allelename}_lr_mapping_old.bam
     samtools index -@ 4 ${allelename}_lr_mapping.bam
-    samtools faidx ${assembly} 
+    samtools faidx ${assembly}/assembly.fasta
     """
     // """
     // minimap2 -ax map-ont -t ${task.cpus} ${assembly}/assembly.fasta ${splitted_reads} | samtools sort -@ 4 -m 1G  > ${allelename}_lr_mapping.bam
@@ -214,14 +213,14 @@ process HAPDUP{
 process UNPHASED {
 
     input:
-    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder), path(splitted_reads)
+    tuple val(sample_name), val(allelename), path(assembly), path(fastq), val(contigs)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assemblyfolder)
+    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assembly)
     
     script:
     """
-    cp ${assembly} ${allelename}_assembly.fasta
+    cp ${assembly}/assembly.fasta ${allelename}_assembly.fasta
     """
 }
 

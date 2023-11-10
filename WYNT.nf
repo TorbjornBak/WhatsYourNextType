@@ -22,18 +22,25 @@ workflow{
     ASSEMBLY_ch = FLYEASSEMBLY(DOWNSAMPLED_READS_ch)
     //ASSEMBLY_ch[0].splitFasta(record: [id: true ]).count().view()
     //ASSEMBLY_ch[1].toInteger().view()
-    
     //if (ASSEMBLY_ch[1].toInteger() > 0) {
-        MINISAM_ch = MINISAM(ASSEMBLY_ch[0])
 
-        FINALASSEMBLY_ch = HAPDUP(MINISAM_ch)
-    //}
-    //else {
-      //  FINALASSEMBLY_ch = UNPHASED(ASSEMBLY_ch[0])
-    //}
-    FINALASSEMBLY_ch.view()
+    ASSEMBLYSPLT_ch = ASSEMBLY_ch.splitFasta(elem:4).groupTuple(by:[0,1,2,3])
+       
+    ASSEMBLYSPLT_ch.branch{
+        small: it[4].size() == 1
+        large: it[4].size() > 1
+     }.set{result}
+    
 
-    BLAST_ch = BLASTN(FINALASSEMBLY_ch.transpose()).groupTuple()
+    MINISAM_ch = MINISAM(result.small)
+
+    HAPDUP_ch = HAPDUP(MINISAM_ch)
+    
+    UNPHASED_ch = UNPHASED(result.large)
+
+    BLASTIN_ch = UNPHASED_ch.concat(HAPDUP_ch)    
+
+    BLAST_ch = BLASTN(BLASTIN_ch.transpose()).groupTuple()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
