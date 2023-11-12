@@ -2,6 +2,8 @@ conda install -c conda-forge mamba
 
 mamba env create -f WYNenvironment.yml
 
+mamba init
+
 mamba activate WYNT
 
 wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
