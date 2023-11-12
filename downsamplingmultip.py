@@ -18,11 +18,11 @@ def process_chunk(chunk, length_cutoff):
     filtered_reads = {(read.id): (read.seq) for read in chunk if len(read.seq) > length_cutoff}
     return filtered_reads
 
-def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff):
+def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, threads = multiprocessing.cpu_count()):
 
 
     # Define the number of processes to use
-    num_processes = multiprocessing.cpu_count()
+    num_processes = threads
 
     # Read the FASTQ file in chunks
     records = list(SeqIO.parse(readfile, "fastq"))
@@ -49,10 +49,12 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff):
     print("Assumed fragment length:", assemblylength)
     print("Start coverage:", coverage)
     while coverage > coveragecutoff:
-        for _ in range(int((coverage / coveragecutoff))):
-            readdict.pop(random.choice(list(readdict.keys())))
+        pops = random.sample(list(readdict.items()), k = int(coveragecutoff / coverage * len(list(readdict.items()))))
+
+        readdict = {id:sequence for id, sequence in pops}
         coverage = coverageCalculator(readdict, assemblylength)
     print("Final coverage:", coverage)
+
     return readdict
 
 def writeDownsampledReads(readdict, outputfile,fastqfile):
@@ -87,6 +89,7 @@ def arguments():
     parser.add_argument('--fragmentlength', type = str, default = None)
     parser.add_argument('--allele', type = str, default = None)
     parser.add_argument('--readsizecutoff', type = int, default = 2000)
+    parser.add_argument('--threads', type = int, default = multiprocessing.cpu_count())
     
     return parser.parse_args()
 
@@ -98,7 +101,7 @@ def main():
     else:
         assemblylength = 3200
 
-    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.readsizecutoff)
+    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.readsizecutoff, args.threads)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
 
 main()
