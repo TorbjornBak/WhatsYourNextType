@@ -1,5 +1,5 @@
 # WhatsYourNextType
---- To Install ---
+* To Install *
 
 First step is to clone the repository into a folder on you pc by using the command:
 $ git clone https://github.com/TorbjornBak/WhatsYourNextType
