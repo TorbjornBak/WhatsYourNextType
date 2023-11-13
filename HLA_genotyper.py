@@ -104,8 +104,8 @@ def HLAmatcher(blastdict,hlanomdict, allelelist):
     genes = list()
     for gene in blastdict:
         if blastdict[gene][0][0] in allelelist:
-            genes.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]])
-    
+            genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]],blastdict[gene][0]])
+
     return sorted(genes)
 
 def missingAlleles(genes,allelelist):
@@ -114,7 +114,7 @@ def missingAlleles(genes,allelelist):
     # and checks that there is not more than two of each
     genecount = [0] * len(allelelist) # Initalize empty counter
     for gene in genes:
-        index = allelelist.index(gene[0])
+        index = allelelist.index(gene[0][0])
         genecount[index] += 1
     errorcheck = False
     for i in range(len(genecount)):
