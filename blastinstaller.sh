@@ -1,6 +1,8 @@
-conda install mamba
+conda install -c conda-forge mamba
 
 mamba env create -f WYNenvironment.yml
+
+mamba init
 
 mamba activate WYNT
 
