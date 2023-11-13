@@ -66,7 +66,7 @@ process DOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 2200
+    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
     """
 }
 
@@ -133,6 +133,36 @@ process MINISAM{
 
 }
 
+
+process FILTERNOTMAPPEDREADS{
+
+    conda "bioconda::minimap2 bioconda::samtools"
+    
+    cpus 8
+    memory '4 GB'
+    time 1.hour
+        
+    publishDir "${params.outdir}/${sample_name}/minisam", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(assembly), path(splitted_reads), val(contigs)
+   
+
+    output:
+    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}_lr_mapping.bam"), path("${allelename}_lr_mapping.bam.bai"), path(splitted_reads)
+
+    
+    script:
+    """
+    minimap2 -ax map-ont ${assembly}/assembly.fasta ${splitted_reads} | samtools fastq -n -f 4 - > unassembled_reads.fastq.gz
+    """
+    
+
+
+}
+
+
 process OCTOPUS{
     container "dancooke/octopus:latest"
     cpus 8
@@ -195,7 +225,7 @@ process HAPDUP{
     script:
     if (task.attempt == 1) {
     """
-    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1700 --max-read-error 0.1 --overwrite
+    hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1200 --max-read-error 0.10 --overwrite
 
     cp ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
     cp ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
@@ -204,7 +234,7 @@ process HAPDUP{
     else {
     """
     mkdir ${allelename}_hapdup -p
-    cp ${assembly} ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
+    cp ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
     """
     }
 }

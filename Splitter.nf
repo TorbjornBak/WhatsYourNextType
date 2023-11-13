@@ -33,7 +33,7 @@ process SPLITTER{
 
 process FIRSTDOWNSAMPLING  {
     conda "bioconda::biopython"
-    cpus 1
+    cpus 4
     memory '4 GB'
     time 1.hour
         
@@ -50,6 +50,6 @@ process FIRSTDOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 2200
+    python3 ${projectDir}/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
     """
 }
