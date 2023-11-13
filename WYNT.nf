@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING;UNPHASED} from "./GENOTYPING.nf"
+include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING;UNPHASED;EXTRACTMARGIN} from "./GENOTYPING.nf"
 include {SPLITTER;FIRSTDOWNSAMPLING} from "./Splitter.nf"
 include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
 include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
@@ -38,13 +38,20 @@ workflow{
     
     UNPHASED_ch = UNPHASED(result.large)
 
-    BLASTIN_ch = UNPHASED_ch.concat(HAPDUP_ch)    
+    BLASTIN_ch = UNPHASED_ch.concat(HAPDUP_ch[0])    
 
     BLAST_ch = BLASTN(BLASTIN_ch.transpose()).groupTuple()
+
+    BLAST_ch.view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
-    HLA_type_ch = HLAGENOTYPER(BLASTcat_ch)
+    MARGINLOGS_ch = HAPDUP_ch[1].groupTuple()
+    MARGINLOGS_ch.view()
+
+    HAPLOTYPE_DIST_ch = EXTRACTMARGIN(MARGINLOGS_ch)
+
+    HLA_type_ch = HLAGENOTYPER(BLASTcat_ch.join(HAPLOTYPE_DIST_ch))
 }
 
 
