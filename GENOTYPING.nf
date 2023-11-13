@@ -222,7 +222,7 @@ process HAPDUP{
 
     output:
     tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path("${allelename}_hapdup/")
-    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/margin/margin.log")
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/")
 
 
     script:
@@ -232,6 +232,7 @@ process HAPDUP{
 
     cp ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
     cp ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
+    cp ${allelename}_hapdup/margin/margin.log ${allelename}_hapdup/margin/${allelename}_margin.log
     """
     }
     else {
@@ -240,6 +241,26 @@ process HAPDUP{
     cp ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
     """
     }
+}
+
+process EXTRACTMARGIN {
+
+    publishDir "${params.outdir}/${sample_name}/", mode: 'copy'
+
+    input:
+    tuple val(sample_name), val(allelename), path(hapdupdir)
+
+    output:
+    tuple val(sample_name), path("${sample_name}_haplotypedistribution.csv")
+    
+    script:
+    """
+    for var in ${hapdupdir}
+    do
+    haplotypes=\$(grep Separated \$var/margin/*_margin.log | cut -d " " -f8,10,13)
+    echo \$var, \$haplotypes >> ${sample_name}_haplotypedistribution.csv
+    done
+    """
 }
 
 
