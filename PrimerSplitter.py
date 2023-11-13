@@ -1,4 +1,7 @@
 
+import multiprocessing
+
+
 def reverseComplementaryprimer(primer):
     reverseStrand = ""
     for char in primer.upper():
@@ -15,6 +18,8 @@ def reverseComplementaryprimer(primer):
 
 
 def PrimerSplitter(PrimerList, FastqFile):
+
+    
     
     import subprocess
     infile = open(PrimerList, "r")
