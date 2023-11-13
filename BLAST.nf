@@ -6,6 +6,7 @@ process BLASTN {
     cpus 8
     memory '4 GB'
     time 1.hour
+    tag "${sample_name}:${allelename}"
         
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
@@ -61,7 +62,8 @@ process CATBLAST {
     cpus 1
     memory '4 GB'
     time 1.hour
-
+    tag "${sample_name}:${allelename}"
+    
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
       
     input: 
@@ -80,7 +82,7 @@ process HLAGENOTYPER {
 
     memory '4 GB'
     time 1.hour
-        
+    tag "${sample_name}"
     publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
