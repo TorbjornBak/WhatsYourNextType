@@ -7,15 +7,17 @@ process SPLITTER{
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4
     memory '4 GB'
-    publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
+    tag "${sample_name}"
+
+    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
-    path(fastqFile)
+    tuple val(sample_name), path(fastqFile)
     
 
     output:
-    tuple val(fastqFile.baseName), path("Bins/*_bin.fastq")
+    tuple val(sample_name), path("Bins/*_bin.fastq")
     
     
     script:
@@ -36,7 +38,8 @@ process FIRSTDOWNSAMPLING  {
     cpus 4
     memory '4 GB'
     time 1.hour
-        
+    tag "${fastqFile.baseName}"
+    
     publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
 
     
@@ -45,7 +48,7 @@ process FIRSTDOWNSAMPLING  {
     
 
     output:
-    path("${fastqFile.baseName}_sub.fastq")
+    tuple val("${fastqFile.baseName}"), path("${fastqFile.baseName}_sub.fastq")
 
     
     script:

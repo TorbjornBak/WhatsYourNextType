@@ -5,6 +5,7 @@ process FLYEASSEMBLY{
     conda "bioconda::flye"
     time 1.hour
     maxRetries 3
+    tag "${sample_name}:${splitted_reads.baseName}"
         
     publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
 
@@ -15,7 +16,7 @@ process FLYEASSEMBLY{
 
 
     output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads),path("${splitted_reads.baseName}/assembly.fasta")
+    tuple val(sample_name), val(splitted_reads.baseName), path("${splitted_reads.baseName}"), path(splitted_reads), path("${splitted_reads.baseName}/assembly.fasta")
     
 
     
@@ -28,13 +29,11 @@ process FLYEASSEMBLY{
     else if ((task.attempt == 2)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
-    printf %s | grep contig ${splitted_reads.baseName}/assembly_info.txt| wc -l
     """
     }
     else if ((task.attempt == 3)) {
     """
     flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
-    printf %s | grep contig ${splitted_reads.baseName}/assembly_info.txt| wc -l
     """
     }
 
@@ -50,7 +49,8 @@ process DOWNSAMPLING  {
     cpus 1
     memory '4 GB'
     time 1.hour
-        
+    tag "${sample_name}:${splitted_reads.baseName}"
+
     publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
 
     
@@ -66,7 +66,7 @@ process DOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/readdownsampling.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
+    python3 ${projectDir}/downsamplingmultip.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
     """
 }
 
@@ -104,7 +104,8 @@ process MINISAM{
     cpus 8
     memory '4 GB'
     time 1.hour
-        
+    tag "${sample_name}:${allelename}"
+
     publishDir "${params.outdir}/${sample_name}/minisam", mode: 'copy'
 
     
@@ -210,6 +211,7 @@ process HAPDUP{
     memory '12 GB'
     time 1.hour
     maxRetries 3
+    tag "${sample_name}:${allelename}"
 
     
     publishDir "${params.outdir}/${sample_name}/hapdup/", mode: 'copy'
@@ -220,6 +222,7 @@ process HAPDUP{
 
     output:
     tuple val(sample_name), val(allelename), path("${allelename}_hapdup/${allelename}_hapdup_dual_*.fasta"), path("${allelename}_hapdup/")
+    tuple val(sample_name), val(allelename), path("${allelename}_hapdup/margin/margin.log")
 
 
     script:
@@ -241,6 +244,7 @@ process HAPDUP{
 
 
 process UNPHASED {
+    tag "${sample_name}:${allelename}"
 
     input:
     tuple val(sample_name), val(allelename), path(assembly), path(fastq), val(contigs)
