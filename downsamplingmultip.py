@@ -39,7 +39,7 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, thre
     for result in results:
         readdict.update(result)
 
-    print("Filtered reads:", readdict)
+    #print("Filtered reads:", readdict)
     #Creating a dictionary containing ids and sequences of the reads
     #readdict = {(read.id):(read.seq) for read in (SeqIO.parse(readfile, "fastq")) if len(read.seq) > lengthcutoff}
 
