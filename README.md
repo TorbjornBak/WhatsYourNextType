@@ -26,7 +26,7 @@ Running the pipeline for the first time may take longer than expected as all of 
 
 $ nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*) -profile (local/gridion) --blastdb (pathToBlastDB) (-resume) --coverage (coverage INT)
 
---fastqfile: The fastqfile should be long read ONT. 
+--fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files to the program by using a glob pattern (i.e. "*"). To make this work, the path to the fasqfiles need to written in quotation marks ""
 
 --primerlist: The primerlist should be a tab seperated file with two columns. The first is the names of the HLA types (i.e. HLAA, HLAB, HLAC, DQB1, DPB1, DRB1). The aminoacid sequence of the corresponding primer for each type should be listed in the second column (see Data/HLATypesList.txt as an example)
 
