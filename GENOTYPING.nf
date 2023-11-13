@@ -204,7 +204,7 @@ process HAPDUP{
     else {
     """
     mkdir ${allelename}_hapdup -p
-    cp ${assembly} ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
+    cp ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
     """
     }
 }
