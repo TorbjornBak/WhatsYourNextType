@@ -4,7 +4,7 @@ process FIRSTDOWNSAMPLING  {
     cpus 4
     memory '4 GB'
     time 1.hour
-    tag "${fastqFile.baseName}"
+    tag "${fastqFile.simpleName}"
     
     // publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
 
@@ -14,22 +14,18 @@ process FIRSTDOWNSAMPLING  {
     
 
     output:
-    tuple val("${fastqFile.baseName}"), path("${fastqFile.baseName}_sub.fastq")
+    tuple val("${fastqFile.simpleName}"), path("${fastqFile.simpleName}_sub.fastq")
 
     
     script:
     """
-    if [ -f *.gz ] then 
-    gzip -d ${fastqFile}
-    fi
-
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile.baseName}.fastq --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
     """
 }
 
 
 process SPLITTER{
-    // errorStrategy = "ignore"
+    errorStrategy = "ignore"
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4
     memory '4 GB'

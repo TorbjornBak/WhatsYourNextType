@@ -6,6 +6,7 @@ import os.path
 import random
 from Bio import SeqIO
 import multiprocessing
+import gzip
 
 
 def coverageCalculator(readdict, assemblylength):
@@ -18,14 +19,27 @@ def process_chunk(chunk, length_cutoff):
     filtered_reads = {(read.id): (read.seq) for read in chunk if len(read.seq) > length_cutoff}
     return filtered_reads
 
-def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, threads = multiprocessing.cpu_count()):
+def is_gz_file(filepath):
+    with open(filepath, 'rb') as test_f:
+        return test_f.read(2) == b'\x1f\x8b'
 
+
+def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, threads = multiprocessing.cpu_count()): 
 
     # Define the number of processes to use
     num_processes = threads
 
     # Read the FASTQ file in chunks
-    records = list(SeqIO.parse(readfile, "fastq"))
+    if is_gz_file(readfile):
+    
+        with gzip.open(readfile, "rt") as file:
+            records = list(SeqIO.parse(file, "fastq"))
+        if len(records) == 0:
+            sys.exit(1)
+
+    else:
+        records = list(SeqIO.parse(readfile, "fastq"))
+    
     chunk_size = len(records) // num_processes
     chunks = [records[i:i + chunk_size] for i in range(0, len(records), chunk_size)]
 
@@ -57,12 +71,22 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, thre
 
     return readdict
 
-def writeDownsampledReads(readdict, outputfile,fastqfile):
-    outfile = open(outputfile, 'w')
+def writeDownsampledReads(readdict, outputfile, fastqfile):
     
-    for read in SeqIO.parse(fastqfile, "fastq"):
-        if read.id in readdict:
-            outfile.write(read.format('fastq'))
+    outfile = open(outputfile, 'w')
+
+    if is_gz_file(fastqfile):
+        with gzip.open(fastqfile, "rt") as file:
+            for read in SeqIO.parse(file, "fastq"):
+                if read.id in readdict:
+                    outfile.write(read.format('fastq'))
+    else:
+        for read in SeqIO.parse(fastqfile, "fastq"):
+            if read.id in readdict:
+                outfile.write(read.format('fastq'))
+        
+    return
+    
 
 def findFragmentLength(fragmentlengthfile, allelename):
     allele = allelename.split('_')[0]
