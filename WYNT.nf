@@ -1,11 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING;UNPHASED;EXTRACTMARGIN} from "./GENOTYPING.nf"
-include {SPLITTER;FIRSTDOWNSAMPLING} from "./Splitter.nf"
-include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./BLAST.nf"
-include {CLAIR3; VCFTOFASTA} from "./VariantCalling.nf"
-include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./MSA.nf"
+include {FLYEASSEMBLY;MINISAM;HAPDUP;SHASTA;DOWNSAMPLING;UNPHASED;EXTRACTMARGIN} from "./Scripts/GENOTYPING.nf"
+include {SPLITTER;FIRSTDOWNSAMPLING} from "./Scripts/Splitter.nf"
+include {BLASTN; HLAGENOTYPER; MAKEBLASTDB;CATBLAST;BLASTNC} from "./Scripts/BLAST.nf"
+include {CLAIR3; VCFTOFASTA} from "./Scripts/VariantCalling.nf"
+include {AVA; ISONCLUST; CLUSTERSPLITTER; CLUSTERALIGNER} from "./Scripts/MSA.nf"
 
 // Main workflow script for the pipeline
 

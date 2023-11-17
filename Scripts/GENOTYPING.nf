@@ -61,7 +61,7 @@ process DOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/downsamplingmultip.py  --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
+    python3 ${params.scriptsDir}/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
     """
 }
 
