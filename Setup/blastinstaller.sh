@@ -1,12 +1,9 @@
-#Installing mamba and creating the blast database needed for the pipeline
-conda install -c conda-forge mamba
+#Creating the environment and blast database needed for the pipeline
 
-mamba init
-
-conda env create -f WYNenvironment.yml
+conda env create -f Setup/WYNenvironment.yml
 
 conda activate WYNT
 
-wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O ../Data/hla_gen.fasta
+wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
 
-makeblastdb -in ../Data/hla_gen.fasta -out ../Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
+makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
