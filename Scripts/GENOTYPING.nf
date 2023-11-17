@@ -42,8 +42,6 @@ process FLYEASSEMBLY{
 }
 
 
-
-
 process DOWNSAMPLING  {
     conda "bioconda::biopython"
     cpus 1
@@ -56,9 +54,6 @@ process DOWNSAMPLING  {
     
     input: 
     tuple val(sample_name), path(splitted_reads)
-    
-    
-    
 
     output:
     tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
