@@ -7,7 +7,7 @@ process FLYEASSEMBLY{
     maxRetries 3
     tag "${sample_name}:${splitted_reads.baseName}"
         
-    publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
+    // publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
 
     
     input: 
@@ -49,7 +49,7 @@ process DOWNSAMPLING  {
     time 1.hour
     tag "${sample_name}:${splitted_reads.baseName}"
 
-    publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
+    // publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
 
     
     input: 
@@ -66,32 +66,6 @@ process DOWNSAMPLING  {
 }
 
 
-process SHASTA{
-    
-    conda "bioconda::shasta"
-    cpus 8
-    memory '4 GB'
-    time 1.hour
-        
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
-
-    
-    input: 
-    tuple val(sample_name), val(allelename), path(splitted_reads), path(cluster1),path(cluster2)
-
-    
-
-    output:
-    tuple val(sample_name), val(splitted_reads.baseName), path("${cluster1.baseName}"), path("${cluster2.baseName}"), path(splitted_reads)
-
-    
-    script:
-    """
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster1.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
-    flye --nano-hq ${splitted_reads} --read-error 0.05 --threads ${task.cpus} --out-dir ${cluster2.baseName} --min-overlap 2000 --genome-size 3500 --asm-coverage 100
-
-    """
-}
 process MINISAM{
 
     conda "bioconda::minimap2 bioconda::samtools"
@@ -101,7 +75,7 @@ process MINISAM{
     time 1.hour
     tag "${sample_name}:${allelename}"
 
-    publishDir "${params.outdir}/${sample_name}/minisam", mode: 'copy'
+    //publishDir "${params.outdir}/${sample_name}/minisam", mode: 'copy'
 
     
     input: 
@@ -153,51 +127,9 @@ process FILTERNOTMAPPEDREADS{
     """
     minimap2 -ax map-ont ${assembly}/assembly.fasta ${splitted_reads} | samtools fastq -n -f 4 - > unassembled_reads.fastq.gz
     """
-    
-
 
 }
 
-
-process OCTOPUS{
-    container "dancooke/octopus:latest"
-    cpus 8
-    memory '4 GB'
-    time 1.hour
-        
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
-
-    
-    input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(bamfile), path(indexfile)
-
-    output:
-    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}.vcf.gz")
-
-    
-    script:
-    """
-    octopus -X 2G -B 6G --threads 8 --reads ${bamfile} --reference ${assembly}/assembly.fasta --disable-read-preprocessing -x 2 --dont-protect-reference-haplotype -o ${allelename}.vcf.gz
-    """
-}
-process VCF{
-    conda "vcftools"
-    cpus 8
-    memory '4 GB'
-    time 1.hour
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
-
-    input:
-    tuple val(sample_name), val(allelename), path(assembly), path(VCFfile)
-
-    output:
-    tuple val(sample_name), val(allelename), path(assembly), path("${allelename}.consensus.fasta")
-
-    script:
-    """
-    cat ${assembly}/assembly.fasta | vcf-consensus ${VCFfile} > ${allelename}.consensus.fasta
-    """
-}
 
 process HAPDUP{
     errorStrategy 'retry'
@@ -240,7 +172,7 @@ process HAPDUP{
 
 process EXTRACTMARGIN {
 
-    publishDir "${params.outdir}/${sample_name}/", mode: 'copy'
+    // publishDir "${params.outdir}/${sample_name}/", mode: 'copy'
 
     input:
     tuple val(sample_name), val(allelename), path(hapdupdir)
@@ -274,24 +206,3 @@ process UNPHASED {
     """
 }
 
-process WHATSHAP{
-    //errorStrategy 'ignore'
-    conda = "bioconda::whatshap"
-    cpus 8
-    memory '6 GB'
-    time 1.hour
-        
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
-
-    
-    input: 
-    tuple val(sample_name), val(allelename), path(assembly), path(inputvcf), path(bamfile)
-
-    output:
-    
-
-    script:
-    """
-    whatshap phase -o ${allelename}_phased.vcf --no-reference ${inputvcf} ${bamfile}
-    """
-}
