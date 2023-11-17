@@ -63,11 +63,11 @@ process HLAGENOTYPER {
     
 
     output:
-    tuple val(sample_name), path ("${sample_name}_HLA_type.txt")
+    tuple val(sample_name), path ("${sample_name}_HLA_type.tsv")
     
     script:
     """
-    python3 ${projectDir}/Scripts/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.txt --marginLog ${haplotypedist}
+    python3 ${projectDir}/Scripts/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.tsv --marginLog ${haplotypedist}
     """
 
 }
