@@ -1,4 +1,29 @@
 #!/usr/bin/env nextflow
+process FIRSTDOWNSAMPLING  {
+    conda "bioconda::biopython"
+    cpus 4
+    memory '4 GB'
+    time 1.hour
+    tag "${fastqFile.baseName}"
+    
+    // publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
+
+    
+    input: 
+    path(fastqFile)
+    
+
+    output:
+    tuple val("${fastqFile.baseName}"), path("${fastqFile.baseName}_sub.fastq")
+
+    
+    script:
+    """
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
+    """
+}
+
+
 process SPLITTER{
     errorStrategy = "ignore"
     conda = "bioconda::magicblast conda-forge::biopython"
@@ -6,7 +31,7 @@ process SPLITTER{
     memory '4 GB'
     tag "${sample_name}"
 
-    publishDir "${params.outdir}/${sample_name}", mode: 'copy'
+    // publishDir "${params.outdir}/${sample_name}", mode: 'copy'
 
     
     input: 
@@ -29,27 +54,3 @@ process SPLITTER{
     """
 }
 
-
-process FIRSTDOWNSAMPLING  {
-    conda "bioconda::biopython"
-    cpus 4
-    memory '4 GB'
-    time 1.hour
-    tag "${fastqFile.baseName}"
-    
-    publishDir "${params.outdir}/${fastqFile.baseName}", mode: 'copy'
-
-    
-    input: 
-    path(fastqFile)
-    
-
-    output:
-    tuple val("${fastqFile.baseName}"), path("${fastqFile.baseName}_sub.fastq")
-
-    
-    script:
-    """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
-    """
-}
