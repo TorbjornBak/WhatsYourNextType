@@ -1,6 +1,6 @@
 # WhatsYourNextType
 
-##To Install
+## To Install
 
 First step is to clone the repository into a folder on you pc by using the command:
 $ git clone https://github.com/TorbjornBak/WhatsYourNextType
@@ -39,7 +39,7 @@ Should you wish to use another database, then you can specify it here
 
 --coverage: The max coverage of each type of HLA. So after the reads have been split into their respective bins. They can be downsampled further to tweak coverage. 
 
-## Trouble Shooting
+## Troubleshooting
 Sometimes you may be unable to run mamba and should switch to conda instead. Do this by setting the parameter "conda.useMamba" to false in the nextflow.config file
 
 The assembler (Flye) has a randomizing element to it. Therefore, results may vary slightly and sometimes the assembly may even fail. There is an option to make the assembler deterministic, but this heavily increases the run time. 
