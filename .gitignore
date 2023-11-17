@@ -29,3 +29,5 @@ HapDupTest
 ./Data/PrimerListBigData.tsv
 __pycache__/*
 __pycache__
+DQA1Helo.txt
+DQA1_HLA_type.txt
