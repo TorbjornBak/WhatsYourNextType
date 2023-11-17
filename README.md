@@ -11,7 +11,7 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 In the new terminal run this command to install the blastdatabase in the correct location:
 ```
-sh Scripts/blastinstaller.sh
+bash Setup/blastinstaller.sh
 ```
 or manually:
 ```
