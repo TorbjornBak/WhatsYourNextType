@@ -173,17 +173,24 @@ def printAllGenes(genes):
         print(gene[0],"\t",gene[1])
     return
 
-def printToFile(genes, outputpath):
+def printToFile(genes, outputpath, marginLog):
     #Saving to file
     printString = []
     for gene in genes:
         if gene not in printString:
             printString.append(gene)
     outputfile = open(outputpath,'w')
-
-    for gene in sorted(printString):
-        print(gene[0],"\t",gene[1],file = outputfile)
-    outputfile.close()
+    HapDupDict = readHAPDUP(marginLog)
+    tempGene=""
+    if gene != tempGene:
+            tempGene = gene[0][0]
+            print(gene[0],"\t",gene[1],file = outputfile, end ="\t")
+            for i in range(len(HapDupDict[gene[0][0]])):
+                NumList = [1,2,0]
+                print("H"+str(NumList[i]) +":"+HapDupDict[gene[0][0]][i], file = outputfile, end = "\t")
+    # for gene in sorted(printString):
+    #     
+    # outputfile.close()
     return
 
 
@@ -244,7 +251,7 @@ def main():
 
     printAllGenes(genes)
 
-    printToFile(genes,args.output)
+    printToFile(genes,args.output, args.marginLog)
 
 main()
 
