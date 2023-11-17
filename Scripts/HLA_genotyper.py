@@ -107,16 +107,16 @@ def readHLAgen(hlanomfile):
                     HLA = linesplit[1]
                     # If the line in the file only contains one entry, the HLA key is the same as its value since there is no G group for those genes.
                     hlanomdict[HLAallele,HLA] = [HLAallele, HLA]
+                    
     return hlanomdict
 
 def HLAmatcher(blastdict,hlanomdict, allelelist):
     print("Matching HLA genes to the HLA gene nomenclature G group dictionary")
     #Matches the blast results to the respective g groups from the hla nom dict and saves the genes to a list
-    
     genes = list()
     for gene in blastdict:
         if blastdict[gene][0][0] in allelelist:
-            genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]],blastdict[gene][0]])
+            genes.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]][0])
 
     return sorted(genes)
 
@@ -126,7 +126,7 @@ def missingAlleles(genes,allelelist):
     # and checks that there is not more than two of each
     genecount = [0] * len(allelelist) # Initalize empty counter
     for gene in genes:
-        index = allelelist.index(gene[0][0])
+        index = allelelist.index(gene[0])
         genecount[index] += 1
     errorcheck = False
     for i in range(len(genecount)):
@@ -156,23 +156,17 @@ def printGenes(genes, marginLog):
     print("G-group \t\tAllelebalance")
     for gene in sorted(printString):
         if gene != tempGene:
-            tempGene = gene[0][0]
+            tempGene = gene[0]
             if tempGene in HapDupDict.keys():
-                for i in range(len(HapDupDict[gene[0][0]])):
-                    NumList = ["1","2","0"]
-                    if i < 2:
-                        print(gene[i], end= "\t")
-                        print("H"+NumList[i]+":",HapDupDict[gene[0][0]][i], end = "\n")
-                    else:
-                        print("\t\t\tH"+NumList[i]+":",HapDupDict[gene[0][0]][i])
+                print(gene[0],gene[1],HapDupDict[gene][0],HapDupDict[gene][1],HapDupDict[gene][2])     
             else:
-                print(gene[0],"\t", [gene[1]])
+                print(gene[0],gene[1], "UNPHASED")
     return
 
 def printAllGenes(genes):
     print("Showing all found genes: ")
     for gene in genes:
-        print(gene[0],"\t",gene[1])
+        print(gene[0],gene[1])
     return
 
 def printToFile(genes, outputpath, marginLog):
@@ -185,12 +179,12 @@ def printToFile(genes, outputpath, marginLog):
     HapDupDict = readHAPDUP(marginLog)
     tempGene=""
     if gene != tempGene:
-            tempGene = gene[0][0]
+            tempGene = gene[0]
             print(gene[0],"\t",gene[1],file = outputfile, end ="\t")
-            if gene[0][0] in HapDupDict.keys():
-                for i in range(len(HapDupDict[gene[0][0]])):
+            if gene[0] in HapDupDict.keys():
+                for i in range(len(HapDupDict[gene[0]])):
                     NumList = [1,2,0]
-                    print("H"+str(NumList[i]) +":"+HapDupDict[gene[0][0]][i], file = outputfile, end = "\t")
+                    print("H"+str(NumList[i]) +":"+HapDupDict[gene[0]][i], file = outputfile, end = "\t")
     # for gene in sorted(printString):
     #     
     # outputfile.close()
