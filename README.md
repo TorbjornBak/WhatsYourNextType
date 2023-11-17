@@ -6,12 +6,13 @@ First step is to clone the repository into a folder on you pc by using the comma
 $ git clone https://github.com/TorbjornBak/WhatsYourNextType
 
 The pipeline uses conda so if you do not have Miniconda installed. It can be installed by running these commands
-$ mkdir -p ~/miniconda3
+```mkdir -p ~/miniconda3
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
 $ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 $ rm -rf ~/miniconda3/miniconda.sh
 $ ~/miniconda3/bin/conda init bash
-Restart the termina
+```
+Restart the terminal
 
 In the new terminal type these commands:
 $ conda install mamba
