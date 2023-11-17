@@ -20,7 +20,11 @@ $ bash Scripts/blastinstaller.sh
 ```
 or manually:
 ```
-$ conda install mamba
+$ conda install mamba -c conda-forge
+
+```
+Close and reopen the terminal, then continue with:
+```
 $ mamba env create -f Setup/WYNenvironment.yml
 $ mamba activate WYNT
 $ wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
