@@ -16,7 +16,7 @@ Restart the terminal
 
 In the new terminal run this comman to install the blastdatabase in the correct location:
 ```
-$ bash Scripts/blastinstaller.sh
+$ sh Scripts/blastinstaller.sh
 ```
 or manually:
 ```
