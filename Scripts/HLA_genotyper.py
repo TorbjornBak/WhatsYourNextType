@@ -84,10 +84,6 @@ def readHAPDUP(hapdupLog):
             else:
                 gene = match.group(1)
             HapDupDict[gene] = line.strip().split(", ")[1:]
-
-            
-
-
     return HapDupDict
 
 def readHLAgen(hlanomfile):
@@ -157,15 +153,18 @@ def printGenes(genes, marginLog):
         if gene not in printString:
             printString.append(gene)
     HapDupDict = readHAPDUP(marginLog)
+    print("G-group \t\tAllelebalance")
     for gene in sorted(printString):
         if gene != tempGene:
             tempGene = gene[0][0]
-            print("Allele balance for "+str(gene[0][0]),end = ": ")
             for i in range(len(HapDupDict[gene[0][0]])):
                 NumList = ["1","2","0"]
-                print("H"+NumList[i]+":",HapDupDict[gene[0][0]][i], end = " ")
-        print("\n",gene[0],"\t",gene[1])
-
+                if i < 2:
+                    print(gene[i], end= "\t")
+                    print("H"+NumList[i]+":",HapDupDict[gene[0][0]][i], end = "\n")
+                else:
+                    print("\t\t\tH"+NumList[i]+":",HapDupDict[gene[0][0]][i])
+               
     return
 
 def printAllGenes(genes):
