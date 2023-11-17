@@ -87,7 +87,7 @@ process HLAGENOTYPER {
 
     
     input: 
-    tuple val(sample_name), path(blastresults)
+    tuple val(sample_name), path(blastresults), path(marginLog)
     
 
     output:
@@ -95,7 +95,7 @@ process HLAGENOTYPER {
     
     script:
     """
-    python3 ${projectDir}/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.txt
+    python3 ${projectDir}/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.txt --marginLog ${marginLog}
     """
 
 }
