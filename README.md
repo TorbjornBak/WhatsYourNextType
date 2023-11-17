@@ -14,10 +14,14 @@ $ ~/miniconda3/bin/conda init bash
 ```
 Restart the terminal
 
-In the new terminal type these commands:
+In the new terminal run this comman to install the blastdatabase in the correct location:
+```
+$ bash blastinstaller.sh
+```
+or manually:
 ```
 $ conda install mamba
-$ mamba env create -f WYNenvironment.yml
+$ mamba env create -f Setup/WYNenvironment.yml
 $ mamba activate WYNT
 $ wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
 $ makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
