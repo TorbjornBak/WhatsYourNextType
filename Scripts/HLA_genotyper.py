@@ -166,7 +166,7 @@ def printGenes(genes, marginLog):
                     else:
                         print("\t\t\tH"+NumList[i]+":",HapDupDict[gene[0][0]][i])
             else:
-                print(gene)
+                print(gene[0],"\t" [gene[1]])
     return
 
 def printAllGenes(genes):
