@@ -27,6 +27,8 @@ report*
 PairwiseAlignTest
 HapDupTest
 ./Data/PrimerListBigData.tsv
+./Data/DataforDTU/*
+./Data/DataforDTU/
 __pycache__/*
 __pycache__
 DQA1Helo.txt
