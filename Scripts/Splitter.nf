@@ -19,7 +19,11 @@ process FIRSTDOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
+    if [ -f *.gz ] then 
+    gzip -d ${fastqFile}
+    fi
+
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile.baseName}.fastq --outputfile ${fastqFile.baseName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
     """
 }
 
@@ -44,7 +48,6 @@ process SPLITTER{
     
     script:
     """
-    rm -rf -f Bins 
     mkdir Bins
     python3 ${projectDir}/Scripts/PrimerSplitter.py ${projectDir}/${params.primerlist} ${fastqFile} \$PWD
     magicblast -query Bins/excess2_bin.fastq -db ${projectDir}/${params.blastdb} -out Bins/excess_bin_blast.txt -num_threads ${task.cpus} -gapopen 20 -gapextend 20 -infmt fastq -outfmt tabular
