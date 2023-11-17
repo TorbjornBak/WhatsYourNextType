@@ -15,16 +15,18 @@ $ ~/miniconda3/bin/conda init bash
 Restart the terminal
 
 In the new terminal type these commands:
+```
 $ conda install mamba
 $ mamba env create -f WYNenvironment.yml
 $ mamba activate WYNT
 $ wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
 $ makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
-
+```
 
 ## To Run 
 Running the pipeline for the first time may take longer than expected as all of the conda environments used need to be created. Subsequent runs will be faster. 
 
+```
 $ nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*) -profile (local/gridion) --blastdb (pathToBlastDB) (-resume) --coverage (coverage INT)
 
 --fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files to the program by using a glob pattern (i.e. "*"). To make this work, the path to the fasqfiles need to written in quotation marks ""
@@ -39,7 +41,7 @@ Should you wish to use another database, then you can specify it here
 -resume: Should the pipeline crash, it is possible to resume where it left off, if bugs have been fixed. 
 
 --coverage: The max coverage of each type of HLA. So after the reads have been split into their respective bins. They can be downsampled further to tweak coverage. 
-
+```
 ## Troubleshooting
 Sometimes you may be unable to run mamba and should switch to conda instead. Do this by setting the parameter "conda.useMamba" to false in the nextflow.config file
 
