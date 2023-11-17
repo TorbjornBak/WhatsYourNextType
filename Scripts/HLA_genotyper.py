@@ -160,8 +160,11 @@ def printGenes(genes, marginLog):
     for gene in sorted(printString):
         if gene != tempGene:
             tempGene = gene[0][0]
-            print("Allele balance for "+str(gene[0][0]) +": H1", HapDupDict[gene[0][0]][0], "H2: ",HapDupDict[gene[0][0]][1], "H0:",HapDupDict[gene[0][0]][2])
-        print(gene[0],"\t",gene[1])
+            print("Allele balance for "+str(gene[0][0]),end = ": ")
+            for i in range(len(HapDupDict[gene[0][0]])):
+                NumList = ["1","2","0"]
+                print("H"+NumList[i]+":",HapDupDict[gene[0][0]][i], end = " ")
+        print("\n",gene[0],"\t",gene[1])
 
     return
 
