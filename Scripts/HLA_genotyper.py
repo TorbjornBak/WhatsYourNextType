@@ -157,7 +157,7 @@ def printGenes(genes, marginLog):
     for gene in sorted(printString):
         if gene != tempGene:
             tempGene = gene[0][0]
-            if tempGene in HapDupDict.keys()
+            if tempGene in HapDupDict.keys():
                 for i in range(len(HapDupDict[gene[0][0]])):
                     NumList = ["1","2","0"]
                     if i < 2:
@@ -187,7 +187,7 @@ def printToFile(genes, outputpath, marginLog):
     if gene != tempGene:
             tempGene = gene[0][0]
             print(gene[0],"\t",gene[1],file = outputfile, end ="\t")
-            if gene[0][0] in HapDupDict.keys()    
+            if gene[0][0] in HapDupDict.keys():
                 for i in range(len(HapDupDict[gene[0][0]])):
                     NumList = [1,2,0]
                     print("H"+str(NumList[i]) +":"+HapDupDict[gene[0][0]][i], file = outputfile, end = "\t")
