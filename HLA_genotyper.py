@@ -73,6 +73,22 @@ def readBlast(blastfile):
             
     return blastdict
 
+def readHAPDUP(hapdupLog):
+    import re
+    HapDupDict = dict()
+    with open(hapdupLog, "r") as file:
+        for line in file:
+            match = re.search(r"(.*)_bin.*", line)
+            if match.group(1)[0:3] == "HLA":
+                gene = match.group(1)[3]
+            else:
+                gene = match.group(1)
+            HapDupDict[gene] = line.strip().split(", ")[1:]
+
+            
+
+
+    return HapDupDict
 
 def readHLAgen(hlanomfile):
     print("Reading HLA gene nomenclature G group file and returns it as a dict")
@@ -134,13 +150,19 @@ def benchmarking(correcttype,predictedtypes):
     pass
 
 
-def printGenes(genes):
+def printGenes(genes, marginLog):
     printString = []
+    tempGene = ""
     for gene in genes:
         if gene not in printString:
             printString.append(gene)
+    HapDupDict = readHAPDUP(marginLog)
     for gene in sorted(printString):
+        if gene != tempGene:
+            tempGene = gene[0][0]
+            print("Allele balance for "+str(gene[0][0]) +": H1", HapDupDict[gene[0][0]][0], "H2: ",HapDupDict[gene[0][0]][1], "H0:",HapDupDict[gene[0][0]][2])
         print(gene[0],"\t",gene[1])
+
     return
 
 def printAllGenes(genes):
@@ -180,6 +202,8 @@ def arguments():
     parser.add_argument('--primerlist', type = str)
     parser.add_argument('--threads', type = int, default = 4)
     parser.add_argument('--output', type = str)
+    parser.add_argument('--marginLog', type = str)
+
     
     
     return parser.parse_args()
@@ -214,7 +238,7 @@ def main():
     
     missingAlleles(genes,allelelist)
 
-    printGenes(genes)
+    printGenes(genes, args.marginLog)
 
     printAllGenes(genes)
 
