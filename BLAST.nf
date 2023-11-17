@@ -88,7 +88,6 @@ process HLAGENOTYPER {
     
     input: 
     tuple val(sample_name), path(blastresults), path(haplotypedist)
-    tuple val(sample_name), path(blastresults), path(marginLog)
     
 
     output:
