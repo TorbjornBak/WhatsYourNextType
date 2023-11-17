@@ -27,3 +27,4 @@ report*
 PairwiseAlignTest
 HapDupTest
 ./Data/PrimerListBigData.tsv
+__pycache__
