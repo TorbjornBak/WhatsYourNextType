@@ -6,40 +6,42 @@ First step is to clone the repository into a folder on you pc by using the comma
 $ git clone https://github.com/TorbjornBak/WhatsYourNextType
 
 The pipeline uses conda so if you do not have Miniconda installed. It can be installed by running these commands
-```mkdir -p ~/miniconda3
-$ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-$ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-$ rm -rf ~/miniconda3/miniconda.sh
-$ ~/miniconda3/bin/conda init bash
 ```
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+sh ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
+~/miniconda3/bin/conda init bash
+```
+For macOS, use curl instead of wget
 Restart the terminal
 
 In the new terminal run this comman to install the blastdatabase in the correct location:
 ```
-$ sh Scripts/blastinstaller.sh
+sh Scripts/blastinstaller.sh
 ```
 or manually:
 ```
-$ conda install mamba -c conda-forge
+conda install mamba -c conda-forge
 
 ```
 Close and reopen the terminal, then continue with:
 ```
-$ mamba env create -f Setup/WYNenvironment.yml
-$ mamba activate WYNT
-$ wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
-$ makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
+conda env create -f Setup/WYNenvironment.yml
+conda activate WYNT
+wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
+makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
 ```
 For macOS, use curl instead of wget:
 ```
-$ curl http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
+curl http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
 ```
 
 ## To Run 
 Running the pipeline for the first time may take longer than expected as all of the conda environments used need to be created. Subsequent runs will be faster. 
 
 ```
-$ nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*) -profile (local/gridion) --blastdb (pathToBlastDB) (-resume) --coverage (coverage INT)
+nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*) -profile (local/gridion) --blastdb (pathToBlastDB) (-resume) --coverage (coverage INT)
 
 --fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files to the program by using a glob pattern (i.e. "*"). To make this work, the path to the fasqfiles need to written in quotation marks ""
 
