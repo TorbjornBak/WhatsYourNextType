@@ -1,4 +1,4 @@
-name: WYNT1
+name: WYNT
 
 channels:
   - conda-forge
