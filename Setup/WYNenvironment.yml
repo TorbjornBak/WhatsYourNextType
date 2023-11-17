@@ -1,4 +1,5 @@
-name: WYNT
+name: WYNT1
+
 channels:
   - conda-forge
   - bioconda
