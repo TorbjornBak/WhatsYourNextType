@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 process FIRSTDOWNSAMPLING  {
+    errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 4
     memory '4 GB'
