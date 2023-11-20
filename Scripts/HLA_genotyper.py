@@ -116,7 +116,7 @@ def HLAmatcher(blastdict,hlanomdict, allelelist):
     genes = list()
     for gene in blastdict:
         if blastdict[gene][0][0] in allelelist:
-            genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]],blastdict[gene][0]])
+            genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]]])
             print(genes)
     return sorted(genes)
 
@@ -172,23 +172,25 @@ def printGenes(genes, marginLog):
 def printAllGenes(genes):
     print("Showing all found genes: ")
     for gene in genes:
-        print(gene[0], gene[1])
+        print(gene)
     return
 
 def printToFile(genes, outputpath, marginLog):
     #Saving to file
     printString = []
-    printDict = dict()
+    printDict = dict() 
+    tempGene = []
     for gene in genes:
-        if gene[0][0] not in printDict.keys():
-            printDict[gene[0][0]] = dict()
-            printDict[gene[0][0]]["G-group"] = list()
-        printDict[gene[0][0]]["G-group"].append(gene[0])
-        if gene not in printString:
-            printString.append(gene)
+        if gene[0] != tempGene:
+            tempGene = gene[0]
+            if gene[0][0] not in printDict.keys():
+                printDict[gene[0][0]] = dict()
+                printDict[gene[0][0]]["G-group"] = list()
+            printDict[gene[0][0]]["G-group"].append(gene[0])
+            if gene not in printString:
+                printString.append(gene)
     outputfile = open(outputpath,'w')
     HapDupDict = readHAPDUP(marginLog)
-    tempGene=""
     
     for genes,gGroup in printDict.items():
         for groups in gGroup["G-group"]:
