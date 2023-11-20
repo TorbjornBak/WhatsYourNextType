@@ -202,6 +202,8 @@ process UNPHASED {
     
     script:
     """
+
+    
     cp ${assembly}/assembly.fasta ${allelename}_assembly.fasta
     """
 }
