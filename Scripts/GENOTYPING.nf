@@ -43,6 +43,7 @@ process FLYEASSEMBLY{
 
 
 process DOWNSAMPLING  {
+    errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 1
     memory '4 GB'
