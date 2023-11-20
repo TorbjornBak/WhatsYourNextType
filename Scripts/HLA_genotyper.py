@@ -164,8 +164,9 @@ def printGenes(genes, marginLog):
             iterator += 1
         else:
             print(gene[0], "UNPHASED")
-        if iterator == len(HapDupDict[tempGene[0]]):
-            iterator= 0
+        if tempGene[0] in HapDupDict.keys():
+            if iterator == len(HapDupDict[tempGene[0]]):
+                iterator= 0
 
     return
 
@@ -269,9 +270,9 @@ def main():
     
     missingAlleles(genes,allelelist)
 
-    printGenes(genes, args.marginLog)
+    #printGenes(genes, args.marginLog)
 
-    printAllGenes(genes)
+    #printAllGenes(genes)
 
     printToFile(genes,args.output, args.marginLog)
 
