@@ -196,9 +196,10 @@ def printToFile(genes, outputpath, marginLog):
     for genes,gGroup in printDict.items():
         for groups in gGroup["G-group"]:
             print(groups, file = outputfile, end = "\t")
-        for i in range(len(HapDupDict[genes])):
-            NumList = [1,2,0]
-            print("H"+str(NumList[i]) +":"+HapDupDict[genes][i], file = outputfile, end = "\t")
+        if genes in HapDupDict.keys():
+            for i in range(len(HapDupDict[genes])):
+                NumList = [1,2,0]
+                print("H"+str(NumList[i]) +":"+HapDupDict[genes][i], file = outputfile, end = "\t")
         print("", file = outputfile)
 
 
