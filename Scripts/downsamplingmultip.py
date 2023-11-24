@@ -15,8 +15,8 @@ def coverageCalculator(readdict, assemblylength):
     #print(reads)
     return sum(reads) / assemblylength
 
-def process_chunk(chunk, length_cutoff):
-    filtered_reads = {(read.id): (read.seq) for read in chunk if len(read.seq) > length_cutoff}
+def process_chunk(chunk, lowercutoff,uppercutoff):
+    filtered_reads = {(read.id): (read.seq) for read in chunk if len(read.seq) > lowercutoff and len(read.seq) < uppercutoff}
     return filtered_reads
 
 def is_gz_file(filepath):
@@ -24,7 +24,7 @@ def is_gz_file(filepath):
         return test_f.read(2) == b'\x1f\x8b'
 
 
-def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, threads = multiprocessing.cpu_count()): 
+def readDownSampler(readfile, assemblylength, coveragecutoff, lowercutoff, uppercutoff, threads = multiprocessing.cpu_count()): 
 
     # Define the number of processes to use
     num_processes = threads
@@ -46,7 +46,7 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lengthcutoff, thre
     # Create a multiprocessing Pool
     with multiprocessing.Pool(processes=num_processes) as pool:
         # Use multiprocessing to filter reads in parallel
-        results = pool.starmap(process_chunk, [(chunk, lengthcutoff) for chunk in chunks])
+        results = pool.starmap(process_chunk, [(chunk, lowercutoff, uppercutoff) for chunk in chunks])
 
     # Combine results from different processes
     readdict = {}
@@ -112,7 +112,8 @@ def arguments():
     parser.add_argument('--coveragecutoff', type = int, default = 100)
     parser.add_argument('--fragmentlength', type = str, default = None)
     parser.add_argument('--allele', type = str, default = None)
-    parser.add_argument('--readsizecutoff', type = int, default = 2000)
+    parser.add_argument('--lowercutoff', type = int, default = 2000)
+    parser.add_argument('--uppercutoff', type = int, default = 3700)
     parser.add_argument('--threads', type = int, default = multiprocessing.cpu_count())
     
     return parser.parse_args()
@@ -125,7 +126,7 @@ def main():
     else:
         assemblylength = 3200
 
-    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.readsizecutoff, args.threads)
+    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.lowercutoff, args.uppercutoff, args.threads)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
 
 main()

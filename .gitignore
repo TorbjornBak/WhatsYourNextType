@@ -26,8 +26,9 @@ report*
 *.Identifier
 PairwiseAlignTest
 HapDupTest
-./Data/PrimerListBigData.tsv
-./Data/DataforDTU/*
+Data/PrimerListBigData.tsv
+Data/DataforDTU/*
+Data/DataforDTU/FINALRESULTS/*
 ./Data/DataforDTU/
 __pycache__/*
 __pycache__

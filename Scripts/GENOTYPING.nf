@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-process FLYEASSEMBLY{
+process ASSEMBLY{
     errorStrategy {task.attempt < 3 ? 'retry' : 'ignore'}
     conda "bioconda::flye"
     time 1.hour
@@ -23,47 +23,22 @@ process FLYEASSEMBLY{
     script:
     if (task.attempt == 1) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
     """
     }
     else if ((task.attempt == 2)) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
     """
     }
     else if ((task.attempt == 3)) {
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage 100
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
     """
     }
 
 
 
-}
-
-
-process DOWNSAMPLING  {
-    errorStrategy = "ignore"
-    conda "bioconda::biopython"
-    cpus 1
-    memory '4 GB'
-    time 1.hour
-    tag "${sample_name}:${splitted_reads.baseName}"
-
-    // publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
-
-    
-    input: 
-    tuple val(sample_name), path(splitted_reads)
-
-    output:
-    tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
-
-    
-    script:
-    """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --readsizecutoff 1800
-    """
 }
 
 
@@ -132,7 +107,7 @@ process FILTERNOTMAPPEDREADS{
 }
 
 
-process HAPDUP{
+process PHASING{
     errorStrategy 'retry'
     container = "mkolmogo/hapdup:0.12"
     cpus 4
