@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include {FLYEASSEMBLY;MINISAM;HAPDUP;DOWNSAMPLING;UNPHASED;EXTRACTMARGIN} from "./Scripts/GENOTYPING.nf"
-include {SPLITTER;FIRSTDOWNSAMPLING} from "./Scripts/Splitter.nf"
+include {ASSEMBLY;MINISAM;PHASING;UNPHASED;EXTRACTMARGIN} from "./Scripts/GENOTYPING.nf"
+include {DEMULTIPLEXING;DOWNSAMPLING_1;DOWNSAMPLING_2} from "./Scripts/Splitter.nf"
 include {BLASTN; HLAGENOTYPER; CATBLAST;} from "./Scripts/BLAST.nf"
 
 
@@ -12,13 +12,13 @@ workflow{
     
     FASTQ_ch = Channel.fromPath(params.fastqfile)
 
-    FIRSTDOWNSAMPLING_ch = FIRSTDOWNSAMPLING(FASTQ_ch)
+    FIRSTDOWNSAMPLING_ch = DOWNSAMPLING_1(FASTQ_ch)
     
-    SPLITREADS_ch = SPLITTER(FIRSTDOWNSAMPLING_ch)
+    DEMULTIPLEXED_READS_ch = DEMULTIPLEXING(FIRSTDOWNSAMPLING_ch)
 
-    DOWNSAMPLED_READS_ch = DOWNSAMPLING(SPLITREADS_ch.transpose())
+    DOWNSAMPLED_READS_ch = DOWNSAMPLING_2(DEMULTIPLEXED_READS_ch.transpose())
 
-    ASSEMBLY_ch = FLYEASSEMBLY(DOWNSAMPLED_READS_ch)
+    ASSEMBLY_ch = ASSEMBLY(DOWNSAMPLED_READS_ch)
     //ASSEMBLY_ch[0].splitFasta(record: [id: true ]).count().view()
     //ASSEMBLY_ch[1].toInteger().view()
     //if (ASSEMBLY_ch[1].toInteger() > 0) {
@@ -33,19 +33,19 @@ workflow{
 
     MINISAM_ch = MINISAM(result.small)
 
-    HAPDUP_ch = HAPDUP(MINISAM_ch)
+    PHASED_ch = PHASING(MINISAM_ch)
     
     UNPHASED_ch = UNPHASED(result.large)
 
-    BLASTIN_ch = UNPHASED_ch.concat(HAPDUP_ch[0])    
+    BLAST_INPUT_ch = UNPHASED_ch.concat(PHASED_ch[0])    
 
-    BLAST_ch = BLASTN(BLASTIN_ch.transpose()).groupTuple()
+    BLAST_ch = BLASTN(BLAST_INPUT_ch.transpose()).groupTuple()
 
     BLAST_ch.view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
-    MARGINLOGS_ch = HAPDUP_ch[1].groupTuple()
+    MARGINLOGS_ch = PHASED_ch[1].groupTuple()
     MARGINLOGS_ch.view()
 
     HAPLOTYPE_DIST_ch = EXTRACTMARGIN(MARGINLOGS_ch)

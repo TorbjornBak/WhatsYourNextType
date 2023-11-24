@@ -3,48 +3,11 @@ import sys
 import argparse
 import subprocess
 import os.path
-
-
-def assembleReads(readfiles,threads):
-    print("Assembling reads")
-    resultdir = "Assembly/"
-    subprocess.run(["mkdir",resultdir, "-p"])
-    for reads in readfiles:
-        outputpath = resultdir + os.path.splitext(reads)[0]
-
-        subprocess.run(['flye', "--nano-hq", reads, "--read-error", "0.05", "--threads", str(threads), "--out-dir", outputpath])
-       # subprocess.run(['minimap2', '-ax', 'map-ont', '-t', str(threads), outputpath, reads, '|', 'samtools', 'sort', '-@', '4', '-m', '4G', '>', 'lr_mapping.bam'],shell=True, check=True)
-      #  subprocess.run(['samtools', 'index', '-@', '4', 'lr_mapping.bam'])
-     #   pwdir = f'{resultdir}:{resultdir}'
-    #    assemblypath = outputpath +"/assembly.fasta"
-   #     subprocess.run(['docker', 'run', '-v', pwdir, '-u', ""`id"", ""-u`:`id"", ""-g`"", "mkolmogo/hapdup:0.12", "\",  "hapdup", "--assembly", assemblypath, "--bam", "HD_DIR/lr_mapping.bam", "--out-dir", "HD_DIR/hapdup", "-t", threads, "--rtype", "hifi"])
-        print("Finished assembly for:", reads)
-   
-    
-    #for file in readfiles:
-    #   subprocess.run(['rm',file])
-
-    mergepattern = resultdir + "*/assembly.fasta"
-    mergedfasta = "all_assemblies.fasta"
-    mergecommand = f'cat {mergepattern} > {mergedfasta}'
-
-    print("Merging files to one fasta:", mergedfasta)
-    subprocess.run(mergecommand, shell=True, check=True)
-    
-    return mergedfasta
-    
-
-def blastSequences(fastafile,databasename,threads):
-    print("Blasting sequences")
-    outputpath = "blast" + os.path.splitext(fastafile)[0] + '.txt'
-    subprocess.run(["blastn", "-query", fastafile, "-db", databasename, "-out", outputpath, "-num_alignments", "3", "-gapopen", "3", "-gapextend", "2", "-penalty", "-3", "-reward", "1", "-word_size", "11", "-num_threads", str(threads)])
-    return outputpath
-
+import pandas as pd
 
 def readBlast(blastfile):
     # Reads a blast results file and creates a dictionary with the entries 
     # with the highest alignmentscore for each contig that was blasted
-    print("Reading blast results and saving to dict")
     blastdict = dict()
     Query = ""
     HLAvariant = ""
@@ -74,6 +37,7 @@ def readBlast(blastfile):
     return blastdict
 
 def readHAPDUP(hapdupLog):
+    #Reads HAPDUP / margin log and returns a dict with the information regarding haplotype distribution
     import re
     HapDupDict = dict()
     with open(hapdupLog, "r") as file:
@@ -86,8 +50,11 @@ def readHAPDUP(hapdupLog):
             HapDupDict[gene] = line.strip().split(", ")[1:]
     return HapDupDict
 
+
+
+
 def readHLAgen(hlanomfile):
-    print("Reading HLA gene nomenclature G group file and returns it as a dict")
+    #print("Reading HLA gene nomenclature G group file and returns it as a dict")
     # Reads the HLA gene nomenclature G group file and returns it as a dict
     hlanomdict = dict()
     HLAg = ""
@@ -111,16 +78,40 @@ def readHLAgen(hlanomfile):
     return hlanomdict
 
 def HLAmatcher(blastdict,hlanomdict, allelelist):
-    print("Matching HLA genes to the HLA gene nomenclature G group dictionary")
+    #print("Matching HLA genes to the HLA gene nomenclature G group dictionary")
     #Matches the blast results to the respective g groups from the hla nom dict and saves the genes to a list
-    genes = list()
+    #genes = list()
+    df = pd.DataFrame()
+    grouplist = list()
+    typelist = list() 
+    exactTypeList = list()
     for gene in blastdict:
         if blastdict[gene][0][0] in allelelist:
-            genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]]])
-            print(genes)
-    return sorted(genes)
+            #genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]]])
+            grouplist.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]][0])
+            typelist.append(hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]][1])
+            exactTypeList.append("*".join(blastdict[gene][0]))
+    
+    df["HLAgroup"] = grouplist
+    df["HLAnr"] = typelist
+    df["HLAtypeG"] = [f'{g}*{t}' for g, t in zip(grouplist, typelist)]
+    df["ExactHLAtype"] = exactTypeList
+    
+    lastGroup = None
+    HNrList = list()
+    for group in df["HLAgroup"]:
+        if lastGroup != group:
+            HNrList.append("H1")
+            lastGroup = group
+        else:
+            HNrList.append("H2")
+            lastGroup = group
+    df["HNr"] = HNrList
+    #print(df)
 
-def missingAlleles(genes,allelelist):
+    return df
+
+#def missingAlleles(genes,allelelist):
     print("Checking if any alleles are missing.")
     # Checking if there is at least one of each HLA gene 
     # and checks that there is not more than two of each
@@ -141,12 +132,35 @@ def missingAlleles(genes,allelelist):
     print(genecount)  
     return allelelist, genecount
 
-def benchmarking(correcttype,predictedtypes):
+def missingAllelesPD(HLAdf,allelelist):
+    #print("Checking if any alleles are missing.")
+    # Checking if there is at least one of each HLA gene 
+    # and checks that there is not more than two of each
+    genecount = [0] * len(allelelist) # Initalize empty counter
+    #print(HLAdf["HLAgroup"])
+    for gene in list(HLAdf["HLAgroup"]):
+        index = allelelist.index(gene)
+        genecount[index] += 1
+    errorcheck = False
+    for i in range(len(genecount)):
+        if genecount[i] > 2:
+            #print("Error: More than two alleles of gene", allelelist[i], "was found. Do not use these results!")
+            errorcheck = True
+        elif genecount[i] == 0:
+            print("Error: No alleles of gene", allelelist[i], "was found. Do not use these results!")
+            errorcheck = True
+    if errorcheck == False:
+        print("Success: there were at least one of each gene and not more than two of each.")
+    print(genecount)  
+    
+    return allelelist, genecount
 
+def benchmarking(correcttype,predictedtypes):
+    #NOT IMPLEMENTED
     pass
 
 
-def printGenes(genes, marginLog):
+#def printGenes(genes, marginLog):
     printString = []
     tempGene = ""
     for gene in genes:
@@ -170,13 +184,13 @@ def printGenes(genes, marginLog):
 
     return
 
-def printAllGenes(genes):
+#def printAllGenes(genes):
     print("Showing all found genes: ")
     for gene in genes:
         print(gene)
     return
 
-def printToFile(genes, outputpath, marginLog):
+#def printToFile(genes, outputpath, marginLog):
     #Saving to file
     printString = []
     printDict = dict() 
@@ -217,7 +231,29 @@ def printToFile(genes, outputpath, marginLog):
     outputfile.close()
     return
 
+def addHaplotypeInfo(haplotypediv, df):
+    haplotypedivList = list()
+    unmappedreadsList = list()
+    for group, hnr in zip(df["HLAgroup"], df["HNr"]):
+        if group in haplotypediv and len(haplotypediv[group]) > 1:
+            if hnr == "H1":
+                haplotypedivList.append(haplotypediv[group][0])
+            elif hnr == "H2":
+                haplotypedivList.append(haplotypediv[group][1])
+            unmappedreadsList.append(haplotypediv[group][2])
+        else:
+            haplotypedivList.append("Unphased")
+            unmappedreadsList.append("-")
+    df["HapDupPhaseCoverage"] = haplotypedivList
+    df["UnmappedReadCoverage"] = unmappedreadsList
 
+    return df
+
+def sortDataFramebyList(df, sorted_list):
+    df['sort_index'] = df['HLAgroup'].map({val: i for i, val in enumerate(sorted_list)})
+    df_sorted = df.sort_values(by='sort_index').drop('sort_index', axis=1)
+    df_sorted = df_sorted.reset_index(drop=True)
+    return df_sorted
 
 class CustomParser(argparse.ArgumentParser):
     def error(self, message):
@@ -235,8 +271,8 @@ def arguments():
     parser.add_argument('--primerlist', type = str)
     parser.add_argument('--threads', type = int, default = 4)
     parser.add_argument('--output', type = str)
-    parser.add_argument('--marginLog', type = str)
-
+    parser.add_argument('--marginLog', default= None, type = str)
+    parser.add_argument('--recursive', default = False, type = bool)
     
     
     return parser.parse_args()
@@ -260,22 +296,41 @@ def arguments():
 
 # main()
 
+def recursive_main(blastfiles, hlagen, marginLog, output):
+    for blastfile in blastfiles:
+        blastdict = readBlast(blastfile)
+        hlanomdict = readHLAgen(hlagen)
+        allelelist = ["A","B","C","DRB1","DQA1","DQB1","DPB1"]
+        resultDF = HLAmatcher(blastdict,hlanomdict,allelelist)
+
+        missingAllelesPD(resultDF,allelelist)
+        if marginLog is not None:
+            haplotypediv = readHAPDUP(marginLog)
+            resultDF = addHaplotypeInfo(haplotypediv, resultDF)
+        
+        resultDF = sortDataFramebyList(resultDF,allelelist)
+        resultDF.to_csv(output, sep = '\t')
+
 def main():
     args = arguments()
+
+    if args.recursive is True:
+        return recursive_main()
     
     blastdict = readBlast(args.blastfile)
     hlanomdict = readHLAgen(args.hlagen)
     allelelist = ["A","B","C","DRB1","DQA1","DQB1","DPB1"]
-    genes = HLAmatcher(blastdict,hlanomdict,allelelist)
+    resultDF = HLAmatcher(blastdict,hlanomdict,allelelist)
+
+    missingAllelesPD(resultDF,allelelist)
+    if args.marginLog is not None:
+        haplotypediv = readHAPDUP(args.marginLog)
+        resultDF = addHaplotypeInfo(haplotypediv, resultDF)
     
-    
-    missingAlleles(genes,allelelist)
+    resultDF = sortDataFramebyList(resultDF,allelelist)
+    resultDF.to_csv(args.output, sep = '\t')
+    print(resultDF)
 
-    #printGenes(genes, args.marginLog)
-
-    #printAllGenes(genes)
-
-    printToFile(genes,args.output, args.marginLog)
 
 main()
 

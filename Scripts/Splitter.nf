@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-process FIRSTDOWNSAMPLING  {
+process DOWNSAMPLING_1  {
     errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 4
@@ -20,12 +20,36 @@ process FIRSTDOWNSAMPLING  {
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --readsizecutoff 1800 --threads ${task.cpus}
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --lowercutoff 1800 --uppercutoff 3700 --threads ${task.cpus}
+    """
+}
+
+process DOWNSAMPLING_2  {
+    errorStrategy = "ignore"
+    conda "bioconda::biopython"
+    cpus 1
+    memory '4 GB'
+    time 1.hour
+    tag "${sample_name}:${splitted_reads.baseName}"
+
+    // publishDir "${params.outdir}/${sample_name}/downsampled_reads", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), path(splitted_reads)
+
+    output:
+    tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
+
+    
+    script:
+    """
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 1800 --uppercutoff 3700
     """
 }
 
 
-process SPLITTER{
+process DEMULTIPLEXING{
     errorStrategy = "ignore"
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4
@@ -53,5 +77,6 @@ process SPLITTER{
     rm Bins/excess2_bin.fastq -f
     """
 }
+
 
     
