@@ -41,12 +41,11 @@ workflow{
 
     BLAST_ch = BLASTN(BLAST_INPUT_ch.transpose()).groupTuple()
 
-    BLAST_ch.view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
     MARGINLOGS_ch = PHASED_ch[1].groupTuple()
-    MARGINLOGS_ch.view()
+    
 
     HAPLOTYPE_DIST_ch = EXTRACTMARGIN(MARGINLOGS_ch)
 

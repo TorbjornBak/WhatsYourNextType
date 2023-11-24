@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 process ASSEMBLY{
+    debug false
     errorStrategy {task.attempt < 3 ? 'retry' : 'ignore'}
     conda "bioconda::flye"
     time 1.hour
@@ -45,7 +46,7 @@ process ASSEMBLY{
 process MINISAM{
 
     conda "bioconda::minimap2 bioconda::samtools"
-    
+    debug false
     cpus 8
     memory '4 GB'
     time 1.hour
@@ -108,6 +109,7 @@ process FILTERNOTMAPPEDREADS{
 
 
 process PHASING{
+    debug false
     errorStrategy 'retry'
     container = "mkolmogo/hapdup:0.12"
     cpus 4

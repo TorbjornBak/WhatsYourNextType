@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import os.path
 import pandas as pd
+import glob
 
 def readBlast(blastfile):
     # Reads a blast results file and creates a dictionary with the entries 
@@ -147,10 +148,12 @@ def missingAllelesPD(HLAdf,allelelist):
             #print("Error: More than two alleles of gene", allelelist[i], "was found. Do not use these results!")
             errorcheck = True
         elif genecount[i] == 0:
-            print("Error: No alleles of gene", allelelist[i], "was found. Do not use these results!")
+            #print("Error: No alleles of gene", allelelist[i], "was found. Do not use these results!")
             errorcheck = True
     if errorcheck == False:
         print("Success: there were at least one of each gene and not more than two of each.")
+    else:
+        print("Error")
     print(genecount)  
     
     return allelelist, genecount
@@ -277,27 +280,12 @@ def arguments():
     
     return parser.parse_args()
 
-# def main():
-#     args = arguments()
-    
-#     readfiles = PrimerSplitter.PrimerSplitter(args.primerlist,args.reads)
-#     assembly = assembleReads(readfiles,args.threads)
 
-#     blastfile = blastSequences(assembly,args.hladatabase,args.threads)
-#     blastdict = readBlast(blastfile)
-#     hlanomdict = readHLAgen(args.hlagen)
-#     genes = HLAmatcher(blastdict,hlanomdict)
-#     allelelist = ["A","B","C","DRB1","DQA1","DQB1","DPB1"]
-#     missingAlleles(genes,allelelist)
-
-#     printGenes(genes)
-
-#     printAllGenes(genes)
-
-# main()
-
-def recursive_main(blastfiles, hlagen, marginLog, output):
-    for blastfile in blastfiles:
+def recursive_main(blastpaths, hlagen, marginLog):
+    print(blastpaths)
+    blastpaths = glob.iglob(blastpaths)
+    print(blastpaths)
+    for blastfile in blastpaths:
         blastdict = readBlast(blastfile)
         hlanomdict = readHLAgen(hlagen)
         allelelist = ["A","B","C","DRB1","DQA1","DQB1","DPB1"]
@@ -309,13 +297,14 @@ def recursive_main(blastfiles, hlagen, marginLog, output):
             resultDF = addHaplotypeInfo(haplotypediv, resultDF)
         
         resultDF = sortDataFramebyList(resultDF,allelelist)
-        resultDF.to_csv(output, sep = '\t')
+        outputpath = os.path.splitext(blastfile)[0] + '_HLA_type.tsv'
+        resultDF.to_csv(outputpath, sep = '\t')
 
 def main():
     args = arguments()
 
     if args.recursive is True:
-        return recursive_main()
+        return recursive_main(args.blastfile, args.hlagen, args.marginLog)
     
     blastdict = readBlast(args.blastfile)
     hlanomdict = readHLAgen(args.hlagen)

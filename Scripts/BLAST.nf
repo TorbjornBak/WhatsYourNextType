@@ -51,7 +51,7 @@ process CATBLAST {
 }
 
 process HLAGENOTYPER {
-
+    debug true
     memory '4 GB'
     time 1.hour
     tag "${sample_name}"
@@ -68,7 +68,7 @@ process HLAGENOTYPER {
     
     script:
     """
-    
+
     python3 ${projectDir}/Scripts/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.tsv --marginLog ${haplotypedist}
     """
 
