@@ -59,15 +59,16 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lowercutoff, upper
 
     coverage = coverageCalculator(readdict, assemblylength)
     
-    print("Downsampling", readfile)
-    print("Assumed fragment length:", assemblylength)
+    print(f"Downsampling {readfile} to {coveragecutoff}.")
+    print(f"Assumed fragment length: {assemblylength}")
+    
     print("Start coverage:", coverage)
     while coverage > coveragecutoff:
         pops = random.sample(list(readdict.items()), k = int(coveragecutoff / coverage * len(list(readdict.items()))))
 
         readdict = {id:sequence for id, sequence in pops}
         coverage = coverageCalculator(readdict, assemblylength)
-    print("Final coverage:", coverage)
+    print(f"Final coverage: {coverage}")
 
     return readdict
 
@@ -97,6 +98,10 @@ def findFragmentLength(fragmentlengthfile, allelename):
                 file.close()
                 return int(line.split()[1])
 
+def getDynamicCoverage(allelename,factor):
+    allelename = allelename.split("_")[0] #Removing the bin in DRB1_bin
+    coverageDict = {"HLAA":0.9*factor,"HLAB":1*factor,"HLAC":1*factor,"DRB1":1.2*factor,"DQA1":1.2*factor,"DQB1":1*factor,"DPB1":0.8*factor}
+    return int(coverageDict[allelename])
 
 class CustomParser(argparse.ArgumentParser):
     def error(self, message):
@@ -110,6 +115,7 @@ def arguments():
     parser.add_argument('--readfile', type = str)
     parser.add_argument('--outputfile', type = str)
     parser.add_argument('--coveragecutoff', type = int, default = 100)
+    parser.add_argument('--coveragedynamic', action = 'store_true')
     parser.add_argument('--fragmentlength', type = str, default = None)
     parser.add_argument('--allele', type = str, default = None)
     parser.add_argument('--lowercutoff', type = int, default = 2000)
@@ -121,12 +127,18 @@ def arguments():
 
 def main():
     args = arguments()
+    
     if args.allele is not None:
         assemblylength = findFragmentLength(args.fragmentlength, args.allele)
     else:
         assemblylength = 3200
+    
+    if args.coveragedynamic:
+        coverage = getDynamicCoverage(args.allele,args.coveragecutoff)
+    else:
+        coverage = args.coveragecutoff
 
-    readdict = readDownSampler(args.readfile, assemblylength, args.coveragecutoff, args.lowercutoff, args.uppercutoff, args.threads)
+    readdict = readDownSampler(args.readfile, assemblylength, coverage, args.lowercutoff, args.uppercutoff, args.threads)
     writeDownsampledReads(readdict, args.outputfile, args.readfile)
 
 main()

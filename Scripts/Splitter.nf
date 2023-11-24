@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 process DOWNSAMPLING_1  {
+    debug true
     errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 4
@@ -25,6 +26,7 @@ process DOWNSAMPLING_1  {
 }
 
 process DOWNSAMPLING_2  {
+    debug true
     errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 1
@@ -44,7 +46,8 @@ process DOWNSAMPLING_2  {
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 1800 --uppercutoff 3700
+    
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 1800 --uppercutoff 3700 --coveragedynamic
     """
 }
 
