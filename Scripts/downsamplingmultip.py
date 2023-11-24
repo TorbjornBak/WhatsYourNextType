@@ -100,7 +100,7 @@ def findFragmentLength(fragmentlengthfile, allelename):
 
 def getDynamicCoverage(allelename,factor):
     allelename = allelename.split("_")[0] #Removing the bin in DRB1_bin
-    coverageDict = {"HLAA":0.9*factor,"HLAB":1*factor,"HLAC":1*factor,"DRB1":1.2*factor,"DQA1":1.2*factor,"DQB1":1*factor,"DPB1":0.8*factor}
+    coverageDict = {"HLAA":0.9*factor,"HLAB":1*factor,"HLAC":1*factor,"DRB1":0.9*factor,"DQA1":1.2*factor,"DQB1":1*factor,"DPB1":0.8*factor}
     return int(coverageDict[allelename])
 
 class CustomParser(argparse.ArgumentParser):
