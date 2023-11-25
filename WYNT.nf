@@ -45,9 +45,12 @@ workflow{
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
     MARGINLOGS_ch = PHASED_ch[1].groupTuple()
-    
+
+
 
     HAPLOTYPE_DIST_ch = EXTRACTMARGIN(MARGINLOGS_ch)
+
+    BLASTcat_ch.join(HAPLOTYPE_DIST_ch).view()
 
     HLA_type_ch = HLAGENOTYPER(BLASTcat_ch.join(HAPLOTYPE_DIST_ch))
 }
