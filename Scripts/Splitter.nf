@@ -42,11 +42,11 @@ process DOWNSAMPLING_2  {
 
     output:
     tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
-
+    tuple val(sample_name), val("${splitted_reads.baseName}_sub"), path(splitted_reads)
     
     script:
     """
-    
+
     python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 2500 --uppercutoff 3550 --coveragedynamic
     """
 }
