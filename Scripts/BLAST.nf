@@ -68,7 +68,6 @@ process HLAGENOTYPER {
     
     script:
     """
-
     python3 ${projectDir}/Scripts/HLA_genotyper.py --blastfile ${blastresults} --hlagen ${projectDir}/${params.hlaGfile} --output ${sample_name}_HLA_type.tsv --marginLog ${haplotypedist}
     """
 

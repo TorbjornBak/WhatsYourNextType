@@ -62,13 +62,13 @@ def readDownSampler(readfile, assemblylength, coveragecutoff, lowercutoff, upper
     print(f"Downsampling {readfile} to {coveragecutoff}.")
     print(f"Assumed fragment length: {assemblylength}")
     
-    print("Start coverage:", coverage)
+    print(f"Start coverage: {int(coverage)}")
     while coverage > coveragecutoff:
         pops = random.sample(list(readdict.items()), k = int(coveragecutoff / coverage * len(list(readdict.items()))))
 
         readdict = {id:sequence for id, sequence in pops}
         coverage = coverageCalculator(readdict, assemblylength)
-    print(f"Final coverage: {coverage}")
+    print(f"Final coverage: {int(coverage)}")
 
     return readdict
 
@@ -100,7 +100,7 @@ def findFragmentLength(fragmentlengthfile, allelename):
 
 def getDynamicCoverage(allelename,coverage):
     allelename = allelename.split("_")[0] #Removing the bin in DRB1_bin
-    coverageDict = {"HLAA":1.1,"HLAB":1,"HLAC":1,"DRB1":1.2,"DQA1":1.2,"DQB1":1,"DPB1":0.8}
+    coverageDict = {"HLAA":1,"HLAB":1,"HLAC":1,"DRB1":1,"DQA1":1,"DQB1":1,"DPB1":1}
     return int(coverageDict[allelename]*coverage)
 
 class CustomParser(argparse.ArgumentParser):

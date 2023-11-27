@@ -2,7 +2,7 @@
 
 process ASSEMBLY{
     debug false
-    errorStrategy {task.attempt < 3 ? 'retry' : 'ignore'}
+    errorStrategy {task.attempt < 4 ? 'retry' : 'ignore'}
     conda "bioconda::flye"
     time 1.hour
     maxRetries 3
@@ -22,22 +22,30 @@ process ASSEMBLY{
 
     
     script:
-    if (task.attempt == 1) {
+    // if (task.attempt == 1) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2200-(${task.attempt}-1)*200 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 2)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 3)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 4)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    overlap=\$(expr 2400 - ${task.attempt} \\* 200)
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
     """
-    }
-    else if ((task.attempt == 2)) {
-    """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
-    """
-    }
-    else if ((task.attempt == 3)) {
-    """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
-    """
-    }
-
 
 
 }
