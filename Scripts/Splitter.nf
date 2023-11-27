@@ -21,7 +21,7 @@ process DOWNSAMPLING_1  {
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --lowercutoff 2000 --uppercutoff 3550 --threads ${task.cpus}
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --lowercutoff 2000 --uppercutoff 4000 --threads ${task.cpus}
     """
 }
 
@@ -47,7 +47,7 @@ process DOWNSAMPLING_2  {
     script:
     """
 
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 2500 --uppercutoff 3550 --coveragedynamic
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 2000 --uppercutoff 4000
     """
 }
 
