@@ -45,6 +45,7 @@ workflow{
 
     BLAST_ch = BLASTN(BLAST_INPUT_ch.transpose()).groupTuple()
 
+    BLAST_ch.view()
     
     BLASTcat_ch = CATBLAST(BLAST_ch)
 
