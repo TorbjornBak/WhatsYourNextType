@@ -43,8 +43,8 @@ process ASSEMBLY{
     // """
     // }
     """
-    overlap=\$(expr 2400 - ${task.attempt} \\* 200)
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    overlap=\$(expr 2200 - ${task.attempt} \\* 200)
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 10 --asm-coverage ${params.coverage}
     """
 
 
