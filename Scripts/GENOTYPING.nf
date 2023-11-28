@@ -5,7 +5,7 @@ process ASSEMBLY{
     errorStrategy {task.attempt < 4 ? 'retry' : 'ignore'}
     conda "bioconda::flye"
     time 1.hour
-    maxRetries 3
+    maxRetries 4
     tag "${sample_name}:${splitted_reads.baseName}"
         
     // publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
