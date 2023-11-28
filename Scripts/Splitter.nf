@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 process DOWNSAMPLING_1  {
+    debug true
     errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 4
@@ -20,11 +21,12 @@ process DOWNSAMPLING_1  {
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --lowercutoff 1800 --uppercutoff 3700 --threads ${task.cpus}
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${fastqFile} --outputfile ${fastqFile.simpleName}_sub.fastq --coveragecutoff 20000 --lowercutoff 2000 --uppercutoff 4000 --threads ${task.cpus}
     """
 }
 
 process DOWNSAMPLING_2  {
+    debug true
     errorStrategy = "ignore"
     conda "bioconda::biopython"
     cpus 1
@@ -40,11 +42,12 @@ process DOWNSAMPLING_2  {
 
     output:
     tuple val(sample_name), path("${splitted_reads.baseName}_sub.fastq"), path("*.${splitted_reads.baseName}")
-
+    tuple val(sample_name), val("${splitted_reads.baseName}_sub"), path(splitted_reads)
     
     script:
     """
-    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 1800 --uppercutoff 3700
+
+    python3 ${projectDir}/Scripts/downsamplingmultip.py --readfile ${splitted_reads} --outputfile ${splitted_reads.baseName}_sub.fastq --coveragecutoff ${params.coverage} --fragmentlength ${projectDir}/${params.fragmentlength} --allele ${splitted_reads.baseName} --lowercutoff 2000 --uppercutoff 4000
     """
 }
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 process ASSEMBLY{
+    debug false
     errorStrategy {task.attempt < 4 ? 'retry' : 'ignore'}
     conda "bioconda::flye"
     time 1.hour
@@ -21,26 +22,30 @@ process ASSEMBLY{
 
     
     script:
-    if (task.attempt == 1) {
+    // if (task.attempt == 1) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2200-(${task.attempt}-1)*200 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 2)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 3)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
+    // else if ((task.attempt == 4)) {
+    // """
+    // flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 5 --asm-coverage ${params.coverage}
+    // """
+    // }
     """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 2000 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 3 --asm-coverage ${params.coverage}
+    overlap=\$(expr 2200 - ${task.attempt} \\* 200)
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 10 --asm-coverage ${params.coverage}
     """
-    }
-    else if ((task.attempt == 2)) {
-    """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1800 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 3 --asm-coverage ${params.coverage}
-    """
-    }
-    else if ((task.attempt == 3)) {
-    """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1500 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 3 --asm-coverage ${params.coverage}
-    """
-    }
-    else{
-    """
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap 1001 --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 3 --asm-coverage ${params.coverage}
-    """
-    }
 
 
 }
@@ -49,7 +54,7 @@ process ASSEMBLY{
 process MINISAM{
 
     conda "bioconda::minimap2 bioconda::samtools"
-    
+    debug false
     cpus 8
     memory '4 GB'
     time 1.hour
@@ -112,6 +117,7 @@ process FILTERNOTMAPPEDREADS{
 
 
 process PHASING{
+    debug false
     errorStrategy 'retry'
     container = "mkolmogo/hapdup:0.12"
     cpus 4
@@ -137,6 +143,7 @@ process PHASING{
     """
     hapdup --assembly ${assembly}/assembly.fasta --bam ${bamfile} --bam-index ${indexfile} --out-dir ${allelename}_hapdup --rtype hifi -t ${task.cpus} --min-aligned-length 1200 --max-read-error 0.10 --overwrite
 
+    
     cp ${allelename}_hapdup/hapdup_dual_1.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_1.fasta
     cp ${allelename}_hapdup/hapdup_dual_2.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_2.fasta
     cp ${allelename}_hapdup/margin/margin.log ${allelename}_hapdup/margin/${allelename}_margin.log
@@ -148,6 +155,35 @@ process PHASING{
     cp ${assembly}/assembly.fasta ${allelename}_hapdup/${allelename}_hapdup_dual_nophase.fasta
     """
     }
+}
+
+
+process POLISHING {
+    debug false
+    errorStrategy 'ignore'
+    conda "bioconda::flye"
+    time 1.hour
+    maxRetries 3
+    tag "${sample_name}:${allelename}"
+        
+    // publishDir "${params.outdir}/${sample_name}/flye_assembly", mode: 'copy'
+
+    
+    input: 
+    tuple val(sample_name), val(allelename), path(assembly), path(assemblyfolder), path(original_reads)
+    
+
+
+    output:
+    tuple val(sample_name), val(allelename), path("${assembly.baseName}_polished.fasta"), path(assemblyfolder)
+
+    
+    script:
+    """
+    flye --polish-target ${assembly} --nano-hq ${original_reads} --threads ${task.cpus} --out-dir ${assembly}_polished --iterations 5
+    mv ${assembly}_polished/polished_5.fasta ${assembly.baseName}_polished.fasta
+    """
+
 }
 
 process EXTRACTMARGIN {
@@ -175,16 +211,16 @@ process UNPHASED {
     tag "${sample_name}:${allelename}"
 
     input:
-    tuple val(sample_name), val(allelename), path(assembly), path(fastq), val(contigs)
+    tuple val(sample_name), val(allelename), path(assemblyfolder), path(fastq), val(contigs)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assembly)
+    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assemblyfolder)
     
     script:
     """
 
     
-    cp ${assembly}/assembly.fasta ${allelename}_assembly.fasta
+    cp ${assemblyfolder}/assembly.fasta ${allelename}_assembly.fasta
     """
 }
 

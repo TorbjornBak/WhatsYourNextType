@@ -17,16 +17,16 @@ or manually:
 ```
 conda env create -f Setup/WYNenvironment.yml
 conda activate WYNT
-wget http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
+wget https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/hla_gen.fasta -O Data/hla_gen.fasta
 makeblastdb -in Data/hla_gen.fasta -out Data/HLAdatabase/HLA_db -dbtype nucl -title HLA_db
 ```
 For macOS, use curl instead of wget:
 ```
-curl http://ftp.ebi.ac.uk/pub/databases/ipd/imgt/hla/hla_gen.fasta -O Data/hla_gen.fasta
+curl https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/hla_gen.fasta -O Data/hla_gen.fasta
 ```
 
 ## To Run 
-Running the pipeline for the first time may take longer than expected as all of the conda environments used need to be created. Subsequent runs will be faster. 
+Running the pipeline for the first time may take longer than expected as all of the conda environments need to be created. Subsequent runs will be faster. 
 
 ```
 nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*) -profile (local/gridion) --blastdb (pathToBlastDB) (-resume) --coverage (coverage INT)
