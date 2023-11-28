@@ -53,6 +53,7 @@ process DOWNSAMPLING_2  {
 
 
 process DEMULTIPLEXING{
+    debug true
     errorStrategy = "ignore"
     conda = "bioconda::magicblast conda-forge::biopython"
     cpus 4

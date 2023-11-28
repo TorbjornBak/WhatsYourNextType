@@ -19,16 +19,20 @@ def readBlast(blastfile):
 
             if not line.startswith("#"):
                 line = line.split()
-                readid = (line[0])
+                readid = line[0]
 
                 if line[1].startswith("HLA"):
                     allele = line[1].split(":")[1].strip()
                     if readid not in blastdict:
                         blastdict[readid] = []
                     blastdict[readid].append(allele)
-                else:
-                    pass
-    print(seqcount)
+                elif line[1] != "-":
+                    allele = line[1].strip()
+                    if readid not in blastdict:
+                        blastdict[readid] = []
+                    blastdict[readid].append(allele)
+                
+    #print(seqcount)
             
     return blastdict
 
@@ -41,24 +45,29 @@ def readAllelelist(allelefile):
                 alleleid = line[0]
                 allele = line[1]
                 alleledict[alleleid] = allele.strip()
-    print(len(alleledict))
+    #print(len(alleledict))
     return alleledict
 
 
 def idtoallele(blastdict,alleledict):
+    
     ggroupdict = dict()
     for readid in blastdict:
         for gene in blastdict[readid]:
-            allele = tuple(alleledict[gene].split("*"))
-            
-            if allele[0] in ["A","B","C","DRB1","DQA1","DQB1","DPB1"]:
+            if not gene.startswith("HLA"):
+                gene = f'HLA{gene}'
+            try:
+                allele = tuple(alleledict[gene].split("*"))
                 
-                if readid not in ggroupdict:
-                    ggroupdict[readid] = set()
-               
-                ggroupdict[readid].add(allele[0])
+                if allele[0] in ["A","B","C","DRB1","DQA1","DQB1","DPB1"]:
+                    
+                    if readid not in ggroupdict:
+                        ggroupdict[readid] = set()
+                
+                    ggroupdict[readid].add(allele[0])
+            except KeyError as error:
+                pass
 
-    #print(ggroupdict)
     return ggroupdict
 
     

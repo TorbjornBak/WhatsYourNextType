@@ -239,35 +239,35 @@ def benchmarking(correcttype,predictedtypes):
     pass
 
 
-#def printGenes(genes, marginLog):
-    printString = []
-    tempGene = ""
-    for gene in genes:
-        if gene not in printString:
-            printString.append(gene)
-    HapDupDict = readHAPDUP(marginLog)
-    print("G-group \t\tAllelebalance")
-    iterator = 0
-    for gene in sorted(printString):
-        # if gene != tempGene:
-        tempGene = gene[0]
-        if tempGene[0] in HapDupDict.keys():
-            print(tempGene,end = "\t")
-            print("H"+str(iterator+1), HapDupDict[tempGene[0]][iterator])
-            iterator += 1
-        else:
-            print(gene[0], "UNPHASED")
-        if tempGene[0] in HapDupDict.keys():
-            if iterator == len(HapDupDict[tempGene[0]]):
-                iterator= 0
+# def printGenes(genes, marginLog):
+#     printString = []
+#     tempGene = ""
+#     for gene in genes:
+#         if gene not in printString:
+#             printString.append(gene)
+#     HapDupDict = readHAPDUP(marginLog)
+#     print("G-group \t\tAllelebalance")
+#     iterator = 0
+#     for gene in sorted(printString):
+#         # if gene != tempGene:
+#         tempGene = gene[0]
+#         if tempGene[0] in HapDupDict.keys():
+#             print(tempGene,end = "\t")
+#             print("H"+str(iterator+1), HapDupDict[tempGene[0]][iterator])
+#             iterator += 1
+#         else:
+#             print(gene[0], "UNPHASED")
+#         if tempGene[0] in HapDupDict.keys():
+#             if iterator == len(HapDupDict[tempGene[0]]):
+#                 iterator= 0
 
-    return
+#     return
 
-#def printAllGenes(genes):
-    print("Showing all found genes: ")
-    for gene in genes:
-        print(gene)
-    return
+# def printAllGenes(genes):
+#     print("Showing all found genes: ")
+#     for gene in genes:
+#         print(gene)
+#     return
 
 #def printToFile(genes, outputpath, marginLog):
     #Saving to file
@@ -314,15 +314,17 @@ def addHaplotypeInfo(haplotypediv, df):
     haplotypedivList = list()
     unmappedreadsList = list()
     for group, hnr in zip(df["HLAgroup"], df["HNr"]):
+       
         if group in haplotypediv and len(haplotypediv[group]) > 1:
             if hnr == "H1":
                 haplotypedivList.append(haplotypediv[group][0])
-            elif hnr == "H2":
+            else:
                 haplotypedivList.append(haplotypediv[group][1])
             unmappedreadsList.append(haplotypediv[group][2])
         else:
             haplotypedivList.append("Unphased")
             unmappedreadsList.append("-")
+    
     df["HapDupPhaseCoverage"] = haplotypedivList
     df["UnmappedReadCoverage"] = unmappedreadsList
 
