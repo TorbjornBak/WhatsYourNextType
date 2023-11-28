@@ -24,7 +24,7 @@ process BLASTN {
     //"""
     script:
     """
-    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${assembly.baseName}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus}
+    blastn -task megablast -query ${assembly} -db ${projectDir}/${params.blastdb} -out ${assembly.baseName}_blastresults.txt -num_alignments 3 -num_threads ${task.cpus} -gapopen 0 -gapextend 0
     """
 
 }
