@@ -37,18 +37,27 @@ nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfP
     \\ -profile (local/gridion/mac) --blastdb (pathToBlastDB)
     \\ (-resume) --coverage (coverage INT)
 
---fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files to the program by using a glob pattern (i.e. "*"). To make this work, the path to the fasqfiles need to written in quotation marks ""
+--fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files
+     to the program by using a glob pattern (i.e. "*").
+    To make this work, the path to the fasqfiles need to written in quotation marks ""
 
---primerlist: The primerlist should be a tab seperated file with two columns. The first is the names of the HLA types (i.e. HLAA, HLAB, HLAC, DQB1, DPB1, DRB1). The aminoacid sequence of the corresponding primer for each type should be listed in the second column (see Data/HLATypesList.txt as an example)
+--primerlist: The primerlist should be a tab seperated file with two columns. The first is
+    the names of the HLA types (i.e. HLAA, HLAB, HLAC, DQB1, DPB1, DRB1). The aminoacid
+    sequence of the corresponding primer for each type should be listed in the second
+    column (see Data/HLATypesList.txt as an example)
 
--profile: If run with GridION profile, each process is allocated more processing power and more RAM
+-profile: If run with GridION profile, each process is allocated more processing power
+    and more RAM
 
---blastdb: During the install the of the blast database the folder is located at ./Data/HLAdatabase/
-Should you wish to use another database, then you can specify it here
+--blastdb: During the install the of the blast database the folder
+     is located at ./Data/HLAdatabase/.
+    Should you wish to use another database, then you can specify it here
 
--resume: Should the pipeline crash, it is possible to resume where it left off, if bugs have been fixed. 
+-resume: Should the pipeline crash, it is possible to resume where it left off,
+    when bugs have been fixed. 
 
---coverage: The max coverage of each type of HLA. So after the reads have been split into their respective bins. They can be downsampled further to tweak coverage. 
+--coverage: The max coverage of each type of HLA, meaning after the reads have been split
+     into their respective bins. They can be downsampled further to tweak coverage. 
 ```
 
 ## Troubleshooting
