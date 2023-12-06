@@ -65,4 +65,3 @@ Sometimes you may be unable to run mamba and should switch to conda instead. Do 
 
 The assembler (Flye) has a randomizing element to it. Therefore, results may vary slightly and sometimes the assembly may even fail. There is an option to make the assembler deterministic, but this heavily increases the run time. 
 
---
