@@ -1,7 +1,8 @@
 # WhatsYourNextType
 WhatsYourNextType is a pipeline for HLA typing Oxford Nanopore reads, developed in a special
 course at DTU healthtech. 
-HLA typing is not perfect yet, with correct predictions ranging from 55.56\% for some loci,
+
+The pipelines HLA typing performance is not perfect yet, with correct predictions ranging from 55.56\% for some loci,
 to 94.44\% for other loci.
 
 ## To Install
