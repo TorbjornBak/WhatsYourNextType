@@ -69,7 +69,10 @@ Command line arguments:
 ```
 
 ## Troubleshooting
-Sometimes you may be unable to run mamba and should switch to conda instead. Do this by setting the parameter "conda.useMamba" to false in the nextflow.config file
+Switching between using mamba and conda for handling virtual environments is quite easy. 
+As standard, conda is used, but if you want to switch to the faster mamba, 
+change the boolean parameter "conda.useMamba" to true in the nextflow.config file.
 
-The assembler (Flye) has a randomizing element to it. Therefore, results may vary slightly and sometimes the assembly may even fail. There is an option to make the assembler deterministic, but this heavily increases the run time. 
+The assembler (Flye) has a randomizing element to it. Therefore, results may vary slightly and sometimes the assembly may even fail. 
+There is an option to make the assembler deterministic, but this heavily increases the run time. 
 
