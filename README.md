@@ -41,7 +41,10 @@ For macOS, use the `mac` profile tag. The difference here is that singularity do
 nextflow run WYNT.nf --fastqfile (LongReadFastqFile) --primerlist (PathToListOfPrimers*)
     \\ -profile (local/gridion/mac) --blastdb (pathToBlastDB)
     \\ (-resume) --coverage (coverage INT)
+```
 
+Command line arguments:
+```
 --fastqfile: The fastqfile should be long read ONT. It is possible to parse multiple files
      to the program by using a glob pattern (i.e. "*").
     To make this work, the path to the fasqfiles need to written in quotation marks ""
