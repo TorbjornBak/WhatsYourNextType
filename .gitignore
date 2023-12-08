@@ -17,7 +17,6 @@ HLA_database
 cache
 *.zip
 HLAdatabase
-
 *.fast*
 *.fastq.gz
 *.fastq.gz*
