@@ -44,7 +44,7 @@ process ASSEMBLY{
     // }
     """
     overlap=\$(expr 2200 - ${task.attempt} \\* 200)
-    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 10 --asm-coverage ${params.coverage}
+    flye --nano-hq ${splitted_reads} --read-error ${params.readerror} --no-alt-contigs --min-overlap \$overlap --threads ${task.cpus} --out-dir ${splitted_reads.baseName} --genome-size ${expectedgenomesize.baseName} --iterations 10 --asm-coverage ${params.coverage}
     """
 
 
@@ -214,13 +214,20 @@ process UNPHASED {
     tuple val(sample_name), val(allelename), path(assemblyfolder), path(fastq), val(contigs)
 
     output:
-    tuple val(sample_name), val(allelename), path("${allelename}_assembly.fasta"), path(assemblyfolder)
+    tuple val(sample_name), val(allelename), path("${allelename}_assembly/${allelename}_assembly.fasta"), path("${allelename}_assembly/"), emit: RIGHT, optional: true
+    tuple val(sample_name), val(allelename), path("${allelename}_wrong_assembly/"), path(fastq), val(contigs), emit: WRONG, optional: true
     
+
     script:
     """
 
     
-    cp ${assemblyfolder}/assembly.fasta ${allelename}_assembly.fasta
+    blastn -task megablast -query ${assemblyfolder}/assembly.fasta  -db ${projectDir}/${params.blastdb} -out ${assemblyfolder}_blastresults.txt -num_alignments 1 -num_threads ${task.cpus} -gapopen 0 -gapextend 0
+    
+
+    
+    python3 ${projectDir}/Scripts/checkingPhase.py ${assemblyfolder}_blastresults.txt ${allelename} ${assemblyfolder}/assembly.fasta
+    
     """
 }
 

@@ -30,19 +30,19 @@ workflow{
         large: it[4].size() > 1
      }.set{result}
     
-
-    MINISAM_ch = MINISAM(result.small)
-
-    PHASED_ch = PHASING(MINISAM_ch)
-    
     UNPHASED_ch = UNPHASED(result.large)
 
-    BLAST_INPUT_ch = UNPHASED_ch.concat(PHASED_ch[0])
+
+
+    FOR_PHASING_ch = result.small.concat(UNPHASED_ch.WRONG)
+
+    MINISAM_ch = MINISAM(FOR_PHASING_ch)
+
+    PHASED_ch = PHASING(MINISAM_ch)
+
+    BLAST_INPUT_ch = PHASED_ch[0].concat(UNPHASED_ch.RIGHT)
     
-    //BLAST_INPUT_ch.join(DOWNSAMPLED_READS_ch[1], by: [0,1]).view()
-
-    //POLISHED_ch = POLISHING(BLAST_INPUT_ch.join(DOWNSAMPLED_READS_ch[1], by: [0,1]).transpose())
-
+    
     BLAST_ch = BLASTN(BLAST_INPUT_ch.transpose()).groupTuple()
 
     BLAST_ch.view()
