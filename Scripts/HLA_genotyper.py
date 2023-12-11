@@ -33,31 +33,34 @@ def readBlast(blastfile):
             elif line.startswith("HLA") and HLAflag == False and (AlignmentScore is None or int(line.split()[4])*1.001 >= int(prevAlignmentScore)):
                 linesplit = line.split()
                 HLAvariant = [linesplit[1].split("*")[0], linesplit[1].split("*")[1]]
+                    
+                    
+                AlignmentScore = int(linesplit[4])
+                alignmentScoreCutoff = 3000
                 
-                
-                AlignmentScore = linesplit[4]
-                AlignmentLength = linesplit[2]
-                
-                if Query not in blastdict:
-                    blastdict[Query] = {}
+                if AlignmentScore > alignmentScoreCutoff: 
+                    AlignmentLength = int(linesplit[2])
+                    
+                    if Query not in blastdict:
+                        blastdict[Query] = {}
 
-                if (prevAlignmentScore == None or int(AlignmentScore)*1.001 >= int(prevAlignmentScore)) and len(blastdict[Query]) < 3:
-                    HLAflag = False
+                    if (prevAlignmentScore == None or int(AlignmentScore)*1.001 >= int(prevAlignmentScore)) and len(blastdict[Query]) < 3:
+                        HLAflag = False
+                        
+                    else: 
+                        HLAflag = True
+                        
+                    variantNr = f'V{len(blastdict[Query])}'
+                    blastdict[Query][variantNr] = {'HLAvariant':HLAvariant,'AlignmentLength':AlignmentLength, 'AlignmentScore':AlignmentScore}  
                     
-                else: 
-                    HLAflag = True
+                # if lowestLength is None or AlignmentLength < lowestLength:
+                    #    likelyVariant = variantNr
+                    #   lowestLength = AlignmentLength
+                    #  blastdict[Query]["Variant"] = blastdict[Query][likelyVariant]
                     
-                variantNr = f'V{len(blastdict[Query])}'
-                blastdict[Query][variantNr] = {'HLAvariant':HLAvariant,'AlignmentLength':AlignmentLength, 'AlignmentScore':AlignmentScore}  
                 
-               # if lowestLength is None or AlignmentLength < lowestLength:
-                #    likelyVariant = variantNr
-                 #   lowestLength = AlignmentLength
-                  #  blastdict[Query]["Variant"] = blastdict[Query][likelyVariant]
-                
-               
                 prevAlignmentScore = AlignmentScore  
-            
+
             
     
    
@@ -117,12 +120,8 @@ def HLAmatcher(blastdict,hlanomdict, allelelist):
     alternativeTypesList = list()
     scoreList = list()
     for gene in blastdict:
-        #print(gene, blastdict[gene]['Variant'])
-        #print(blastdict[gene]['Variant']['HLAvariant'][0])
-        
         if blastdict[gene]['V0']['HLAvariant'][0] in allelelist:
-            #genes.append([hlanomdict[blastdict[gene][0][0],blastdict[gene][0][1]]])
-
+           
             #blastdict -> querynr -> variant -> {'HLAvariant':HLAvariant,'AlignmentLength':AlignmentLength, 'AlignmentScore':AlignmentScore}
             hlatype = blastdict[gene]['V0']['HLAvariant']
             translatedHlaType = hlanomdict[hlatype[0],hlatype[1]]
@@ -131,30 +130,13 @@ def HLAmatcher(blastdict,hlanomdict, allelelist):
             for HLAtype in blastdict[gene]:
                 
                 altType = blastdict[gene][HLAtype]["HLAvariant"]
-                #print(altType)
-                #print(hlanomdict[altType[0],altType[1]])
+                
                 
                 if HLAtype != 'V0' and hlanomdict[altType[0],altType[1]] != translatedHlaType:
                     #print(altType)
                     altList.append(hlanomdict[altType[0],altType[1]])
-                
-                ## Swapping the allele to the alternative one, if two out of three alleles says the alternative.
-                #if len(altList) == 2 and [altList[0][0],altList[0][1]] == [altList[1][0],altList[1][1]]:
-                    
-                    
-                 #   tmpaltList = translatedHlaType
-
-                  #  translatedHlaType = altList[0]
-                  #  hlatype = altType
-                  #  print(f"Using alternative allele {translatedHlaType} instead of {tmpaltList}")
-
-                  #  altList = tmpaltList
-            
-            
+           
             alternativeTypesList.append(altList)
-
-            #print(hlanomdict[hlatype[0],hlatype[1]])
-
             grouplist.append(translatedHlaType[0])
             typelist.append(translatedHlaType[1])
             exactTypeList.append("*".join(hlatype))
