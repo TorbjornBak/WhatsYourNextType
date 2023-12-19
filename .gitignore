@@ -14,6 +14,7 @@ Test2.fastq.gz
 HLA_db.*
 hla_gen.fasta
 HLA_database
+hla.dat
 cache
 *.zip
 HLAdatabase

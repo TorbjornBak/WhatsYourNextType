@@ -2,15 +2,12 @@ import sys
 
 filename = sys.argv[1]
 
-
-
-
 def removeIntrons(sequence,exons):
     result_sequence = list(sequence)
 
     # Create a list to represent introns with 'N's
-    #introns = ['N'] * len(sequence)
-    introns = list(sequence.lower())
+    introns = ['X'] * len(sequence)
+    #introns = list(sequence.lower())
     try:
         for exon_start, exon_end in exons:
             exon_start = exon_start.replace("<","")
@@ -36,7 +33,6 @@ def intronRemover():
             for line in file:
                 if line.startswith("AC"):
                     variant = line.split()[1].replace(";","")
-                   
                 elif line.startswith("DE"):
                     HLAvariant = line.split()[1].replace(",","").replace("HLA-","")
                 elif line.startswith("FT") and line.split()[1] == "CDS":
