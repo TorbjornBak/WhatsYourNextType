@@ -1,0 +1,9 @@
+name: WYNT
+
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - nextflow
+  - blast
+  - singularity
